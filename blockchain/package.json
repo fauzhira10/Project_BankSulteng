@@ -1,0 +1,13 @@
+{
+    "name": "jurnal-banksulteng-jangkar",
+    "private": true,
+    "type": "module",
+    "description": "Skrip penjangkaran hash blok jejak audit ke Ethereum (Sepolia).",
+    "scripts": {
+        "deploy": "node deploy.mjs"
+    },
+    "dependencies": {
+        "ethers": "^6.13.0",
+        "solc": "0.8.26"
+    }
+}
