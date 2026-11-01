@@ -99,7 +99,6 @@
                                 </option>
                             @endforeach
                         </select>
-                        <span id="slaHelpText" class="text-[0.71875rem] text-slate-500 font-medium">Batas target penyelesaian pusat dihitung otomatis.</span>
                     </div>
 
                     <div class="flex flex-col gap-1.5">
