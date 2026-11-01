@@ -57,6 +57,7 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 | 14 | **Laporan Rekapitulasi Keluhan Bulanan** | Matriks 12 bulan (Jan-Des), tab drilldown bulanan, 8 kelompok klaim standar, dan export Excel identik | **Selesai** | **100%** |
 | 15 | **Monitoring Mesin ATM Bermasalah** | Peringkat terminal ATM berdasarkan jumlah keluhan terbanyak, KPI cards, filter cabang/periode, modal drill-down nasabah, dan export Excel | **Selesai** | **100%** |
 | 16 | **Blockchain Jejak Audit** | Blok berantai dengan merkle root & proof of work, Block Explorer dengan bukti Merkle, jangkar ke smart contract Ethereum Sepolia | **Selesai** (jangkar Sepolia menunggu dompet & deploy kontrak) | **95%** |
+| 17 | **Gudang Data / Data Warehouse** | Skema Bintang (Star Schema: `dim_waktu`, `dim_cabang`, `dim_transaksi`, `fact_keluhan`), service ETL otomatis (Extract, Transform, Load), dan CLI `php artisan dw:sync` | **Selesai** | **100%** |
 
 ---
 
@@ -731,7 +732,43 @@ didapat gratis.
    `Catatan audit #N diubah setelah masuk blok`. Bukti Merkle catatan itu gagal.
 4. Kembalikan nilainya, dan blok kembali **VALID**. Hash hanya bergantung pada isi.
 
-### 8.12 Yang belum dikerjakan
+### 8.12 Gudang Data / Data Warehouse & Pipeline ETL
+
+Modul ini diimplementasikan untuk memenuhi capaian mata kuliah **Gudang Data / Data Warehouse (3 SKS)** pada kurikulum MBKM Teknik Informatika Universitas Tadulako.
+
+#### 1. Arsitektur Skema Bintang (Star Schema)
+Data analitik keluhan dipisahkan dari tabel transaksional operasional (`jurnals`) ke dalam struktur skema bintang multidimensi:
+
+* **Tabel Fakta:**
+  * `fact_keluhan`: Menyimpan foreign key ke seluruh dimensi serta metrik analitik: `nominal_transaksi`, `biaya_admin`, `durasi_penyelesaian_hari`, `status`, dan flag `is_selesai`.
+* **Tabel Dimensi:**
+  * `dim_waktu`: Menyimpan atribut waktu (`tanggal`, `tahun`, `kuartal` (Q1–Q4), `bulan`, `nama_bulan`, `hari`, `nama_hari`).
+  * `dim_cabang`: Menyimpan snapshot kantor cabang dan KCP Bank Sulteng (`master_cabang_id`, `kode_cabang`, `nama_cabang`).
+  * `dim_transaksi`: Menyimpan saluran layanan (`master_transaksi_id`, `jenis_transaksi`, `channel`).
+
+#### 2. Pipeline ETL (Extract, Transform, Load)
+Dikelola oleh `App\Services\DataWarehouseEtlService`:
+1. **Extract**: Mengekstrak seluruh catatan keluhan nasabah dari tabel operasional `jurnals` beserta relasi cabangnya.
+2. **Transform**:
+   * *Data Cleansing*: Normalisasi inkonsistensi tanggal input manual (`abs(diffInDays)`).
+   * *Categorization*: Penentuan kuartal kalender dan klasifikasi penyelesaian (`is_selesai`).
+   * *Normalization*: Pengisian nilai default pada nominal/channel yang kosong.
+3. **Load**:
+   * Sinkronisasi data unik ke tabel dimensi.
+   * *Upsert* (Update or Create) baris metrik ke tabel fakta `fact_keluhan` berdasarkan `jurnal_id`.
+
+#### 3. Perintah Eksekusi CLI
+```powershell
+# Sinkronisasi bertahap / pembaruan data
+php artisan dw:sync
+
+# Sinkronisasi ulang dari nol (truncate & reload)
+php artisan dw:sync --fresh
+```
+
+Pipeline ini juga dijadwalkan secara otomatis setiap dini hari pukul 02:00 WITA melalui `routes/console.php`.
+
+### 8.13 Yang belum dikerjakan
 
 Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
 

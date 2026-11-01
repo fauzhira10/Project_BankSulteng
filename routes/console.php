@@ -48,3 +48,13 @@ Schedule::command('blockchain:periksa --jangkar')
     ->dailyAt('01:10')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/blockchain-periksa.log'));
+
+/*
+| Data Warehouse ETL Sync (DOCUMENTATION.md bagian 8.12). Menyinkronkan data
+| operasional harian ke skema bintang (dimensi & fakta) setiap dini hari.
+*/
+Schedule::command('dw:sync')
+    ->dailyAt('02:00')
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/dw-sync.log'));
+
