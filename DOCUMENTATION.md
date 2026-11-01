@@ -58,6 +58,7 @@ Projek **Jurnal_Banksulteng** adalah aplikasi web berbasis **Laravel 12/13** yan
 | 15 | **Monitoring Mesin ATM Bermasalah** | Peringkat terminal ATM berdasarkan jumlah keluhan terbanyak, KPI cards, filter cabang/periode, modal drill-down nasabah, dan export Excel | **Selesai** | **100%** |
 | 16 | **Blockchain Jejak Audit** | Blok berantai dengan merkle root & proof of work, Block Explorer dengan bukti Merkle, jangkar ke smart contract Ethereum Sepolia | **Selesai** (jangkar Sepolia menunggu dompet & deploy kontrak) | **95%** |
 | 17 | **Gudang Data / Data Warehouse** | Skema Bintang (Star Schema: `dim_waktu`, `dim_cabang`, `dim_transaksi`, `fact_keluhan`), service ETL otomatis (Extract, Transform, Load), dan CLI `php artisan dw:sync` | **Selesai** | **100%** |
+| 18 | **Sistem SLA & Tingkat Prioritas Pengaduan** | Klasifikasi prioritas CS (Tinggi 2 hari, Sedang 5 hari, Rendah 14 hari), auto-calculate jatuh tempo hari kerja, countdown badges di admin, dan filter kasus overdue | **Selesai** | **100%** |
 
 ---
 

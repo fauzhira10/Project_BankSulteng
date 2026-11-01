@@ -27,7 +27,7 @@
 
     {{-- Filter --}}
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs mb-5 p-4">
-        <form method="GET" action="{{ route('admin.pengaduan.index') }}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1.6fr_1.2fr_1fr_1fr_auto] gap-3 items-end">
+        <form method="GET" action="{{ route('admin.pengaduan.index') }}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1fr_1fr_auto] gap-3 items-end">
             <input type="hidden" name="status" value="{{ $statusAktif }}">
             <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-bold text-slate-700">Cari</label>
@@ -43,16 +43,29 @@
                 </select>
             </div>
             <div class="flex flex-col gap-1.5">
-                <label class="text-xs font-bold text-slate-700">Dikirim Dari</label>
-                <input type="date" name="tgl_dari" value="{{ request('tgl_dari') }}" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                <label class="text-xs font-bold text-slate-700">Prioritas</label>
+                <select name="prioritas" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                    <option value="">-- Semua Prioritas --</option>
+                    <option value="Tinggi" {{ request('prioritas') === 'Tinggi' ? 'selected' : '' }}>Tinggi (Maks. 2 Hari)</option>
+                    <option value="Sedang" {{ request('prioritas') === 'Sedang' ? 'selected' : '' }}>Sedang (Maks. 5 Hari)</option>
+                    <option value="Rendah" {{ request('prioritas') === 'Rendah' ? 'selected' : '' }}>Rendah (Maks. 14 Hari)</option>
+                </select>
             </div>
             <div class="flex flex-col gap-1.5">
-                <label class="text-xs font-bold text-slate-700">Sampai</label>
-                <input type="date" name="tgl_sampai" value="{{ request('tgl_sampai') }}" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                <label class="text-xs font-bold text-slate-700">Batas Waktu (SLA)</label>
+                <select name="sla" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                    <option value="">-- Semua Waktu --</option>
+                    <option value="overdue" {{ request('sla') === 'overdue' ? 'selected' : '' }}>⚠️ Lewat Batas (Overdue)</option>
+                    <option value="urgent" {{ request('sla') === 'urgent' ? 'selected' : '' }}>⏳ Mendekati Batas (≤ 2 Hari)</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-slate-700">Tanggal Kirim</label>
+                <input type="date" name="tgl_dari" value="{{ request('tgl_dari') }}" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
             </div>
             <div class="flex gap-2">
-                <button type="submit" class="h-10 px-4 rounded-xl bg-navy text-white text-xs font-bold hover:opacity-90 cursor-pointer">Terapkan</button>
-                <a href="{{ route('admin.pengaduan.index', ['status' => $statusAktif]) }}" class="h-10 px-4 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold hover:bg-slate-100 inline-flex items-center">Reset</a>
+                <button type="submit" class="h-10 px-4 rounded-xl bg-navy text-white text-xs font-bold hover:opacity-90 cursor-pointer">Filter</button>
+                <a href="{{ route('admin.pengaduan.index', ['status' => $statusAktif]) }}" class="h-10 px-3.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold hover:bg-slate-100 inline-flex items-center">Reset</a>
             </div>
         </form>
     </div>
@@ -83,6 +96,7 @@
                                 <th>Data Nasabah</th>
                                 <th>Transaksi</th>
                                 <th>Nominal</th>
+                                <th>Prioritas & Batas SLA</th>
                                 <th>Status</th>
                                 <th style="text-align:center; width: 110px;">Aksi</th>
                             </tr>
@@ -114,6 +128,24 @@
                                         </div>
                                     </td>
                                     <td style="white-space:nowrap;" class="font-bold text-emerald-600">{{ $p->nominalRupiah() }}</td>
+                                    <td>
+                                        @php
+                                            $prioritasCfg = \App\Models\Pengaduan::DAFTAR_PRIORITAS[$p->prioritas ?? 'Sedang'] ?? \App\Models\Pengaduan::DAFTAR_PRIORITAS['Sedang'];
+                                            $lencana = $p->lencanaSla();
+                                        @endphp
+                                        <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.6875rem] font-bold border {{ $prioritasCfg['badge_bg'] }}">
+                                            {{ $p->prioritas ?? 'Sedang' }} ({{ $p->sla_hari ?? 5 }}h)
+                                        </div>
+                                        <div class="mt-1">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.6875rem] border {{ $lencana['bg'] }}">
+                                                <span>{{ $lencana['icon'] }}</span>
+                                                <span>{{ $lencana['label'] }}</span>
+                                            </span>
+                                        </div>
+                                        @if($p->tgl_jatuh_tempo)
+                                            <div class="text-[0.6875rem] text-slate-500 mt-0.5 font-mono">Batas: {{ $p->tgl_jatuh_tempo->format('d/m/Y') }}</div>
+                                        @endif
+                                    </td>
                                     <td>
                                         @include('partials.pengaduan_status_badge', ['status' => $p->status, 'singkat' => true])
                                         @if($p->jurnal)<div class="text-[0.71875rem] text-slate-500 mt-1">Jurnal #{{ $p->jurnal->id }} &bull; {{ $p->jurnal->status }}</div>@endif

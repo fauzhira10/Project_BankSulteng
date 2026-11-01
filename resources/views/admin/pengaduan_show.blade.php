@@ -54,6 +54,40 @@
 
         {{-- Panel tindak lanjut --}}
         <div class="xl:sticky xl:top-[5.375rem] space-y-4">
+            {{-- Kartu Batas Waktu & Prioritas (SLA) --}}
+            @php
+                $prioritasCfg = \App\Models\Pengaduan::DAFTAR_PRIORITAS[$pengaduan->prioritas ?? 'Sedang'] ?? \App\Models\Pengaduan::DAFTAR_PRIORITAS['Sedang'];
+                $lencana = $pengaduan->lencanaSla();
+            @endphp
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-5">
+                <div class="text-[0.71875rem] uppercase tracking-wider text-slate-500 font-bold mb-2">Batas Waktu Layanan (SLA)</div>
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-extrabold border {{ $prioritasCfg['badge_bg'] }}">
+                        Prioritas {{ $pengaduan->prioritas ?? 'Sedang' }}
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border {{ $lencana['bg'] }}">
+                        <span>{{ $lencana['icon'] }}</span>
+                        <span>{{ $lencana['label'] }}</span>
+                    </span>
+                </div>
+                <div class="text-xs text-slate-600 bg-slate-50 rounded-xl p-3 border border-slate-200 space-y-1.5">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Durasi Target:</span>
+                        <strong class="text-slate-700">Maksimal {{ $pengaduan->sla_hari ?? 5 }} Hari Kerja</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Tanggal Pengaduan:</span>
+                        <strong class="text-slate-700">{{ $pengaduan->created_at->format('d/m/Y H:i') }}</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Batas Waktu (Jatuh Tempo):</span>
+                        <strong class="{{ $lencana['status'] === 'overdue' ? 'text-rose-600 font-extrabold' : 'text-navy font-bold' }}">
+                            {{ $pengaduan->tgl_jatuh_tempo ? $pengaduan->tgl_jatuh_tempo->format('d/m/Y') : '-' }}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
                 <div class="px-5 py-4 border-b border-slate-200 bg-navy text-white">
                     <div class="text-[0.875rem] font-bold">Tindak Lanjut Pusat</div>

@@ -91,6 +91,18 @@
                     </div>
 
                     <div class="flex flex-col gap-1.5">
+                        <label class="{{ $labelCls }}">Tingkat Prioritas (SLA Target) <span class="text-rose-600 font-bold">*</span></label>
+                        <select name="prioritas" id="prioritasSelect" required class="{{ $inputCls }}">
+                            @foreach($daftarPrioritas as $kunci => $cfg)
+                                <option value="{{ $kunci }}" {{ $nilai('prioritas', 'Sedang') === $kunci ? 'selected' : '' }} data-hari="{{ $cfg['sla_hari'] }}" data-ket="{{ $cfg['keterangan'] }}">
+                                    {{ $cfg['label'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <span id="slaHelpText" class="text-[0.71875rem] text-slate-500 font-medium">Batas target penyelesaian pusat dihitung otomatis.</span>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
                         <label class="{{ $labelCls }}">Sub Kategori</label>
                         <input type="text" name="sub_kategori" value="{{ $nilai('sub_kategori') }}" maxlength="255" placeholder="Contoh: TARIK TUNAI" class="{{ $inputCls }} uppercase" oninput="this.value = this.value.toUpperCase()">
                     </div>
@@ -446,6 +458,21 @@
     const kronologiCount = document.getElementById('kronologiCount');
     function hitungKronologi() { if (kronologiEl && kronologiCount) kronologiCount.textContent = kronologiEl.value.trim().length; }
     if (kronologiEl) kronologiEl.addEventListener('input', hitungKronologi);
+
+    // ---------- Helper Prioritas SLA ----------
+    const prioritasSelect = document.getElementById('prioritasSelect');
+    const slaHelpText = document.getElementById('slaHelpText');
+    function updateSlaHelp() {
+        if (!prioritasSelect || !slaHelpText) return;
+        const opt = prioritasSelect.options[prioritasSelect.selectedIndex];
+        if (opt && opt.dataset.ket) {
+            slaHelpText.textContent = opt.dataset.ket;
+        }
+    }
+    if (prioritasSelect) {
+        prioritasSelect.addEventListener('change', updateSlaHelp);
+        updateSlaHelp();
+    }
 
     // ---------- Cegah klik ganda ----------
     const formEl = document.getElementById('formPengaduan');

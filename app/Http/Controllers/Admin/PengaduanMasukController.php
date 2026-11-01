@@ -37,6 +37,18 @@ class PengaduanMasukController extends Controller
         if ($request->filled('master_cabang_id')) {
             $query->where('master_cabang_id', $request->master_cabang_id);
         }
+        if ($request->filled('prioritas')) {
+            $query->where('prioritas', $request->prioritas);
+        }
+        if ($request->input('sla') === 'overdue') {
+            $query->whereNull('jurnal_id')
+                ->where('status', '!=', PengaduanStatus::Ditolak->value)
+                ->whereDate('tgl_jatuh_tempo', '<', now()->toDateString());
+        } elseif ($request->input('sla') === 'urgent') {
+            $query->whereNull('jurnal_id')
+                ->where('status', '!=', PengaduanStatus::Ditolak->value)
+                ->whereBetween('tgl_jatuh_tempo', [now()->toDateString(), now()->addDays(2)->toDateString()]);
+        }
         if ($request->filled('tgl_dari')) {
             $query->whereDate('created_at', '>=', $request->tgl_dari);
         }

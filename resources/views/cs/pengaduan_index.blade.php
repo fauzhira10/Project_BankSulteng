@@ -94,6 +94,18 @@
                                     <td style="white-space:nowrap;" class="font-bold text-emerald-600">{{ $p->nominalRupiah() }}</td>
                                     <td>
                                         @include('partials.pengaduan_status_badge', ['status' => $p->status])
+                                        @php
+                                            $prioritasCfg = \App\Models\Pengaduan::DAFTAR_PRIORITAS[$p->prioritas ?? 'Sedang'] ?? \App\Models\Pengaduan::DAFTAR_PRIORITAS['Sedang'];
+                                            $lencana = $p->lencanaSla();
+                                        @endphp
+                                        <div class="mt-1.5 flex items-center gap-1 flex-wrap">
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[0.6875rem] font-bold border {{ $prioritasCfg['badge_bg'] }}">
+                                                {{ $p->prioritas ?? 'Sedang' }}
+                                            </span>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[0.6875rem] border {{ $lencana['bg'] }}">
+                                                {{ $lencana['label'] }}
+                                            </span>
+                                        </div>
                                         @if($p->jurnal && $p->jurnal->no_tiket && $p->jurnal->no_tiket !== '-')
                                             <div class="text-[0.71875rem] text-slate-500 mt-1">Tiket: {{ $p->jurnal->no_tiket }}</div>
                                         @endif

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PengaduanStatus;
 use App\Services\NomorTiketService;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +28,9 @@ class Pengaduan extends Model
         'nama_pelapor',
         'master_cabang_id',
         'kategori',
+        'prioritas',
+        'sla_hari',
+        'tgl_jatuh_tempo',
         'sub_kategori',
         'sub_kategori_2',
         'nama_nasabah',
@@ -62,6 +66,7 @@ class Pengaduan extends Model
             // dicari di scopeCari(); semuanya patah bila nilainya terenkripsi.
             'no_ktp' => 'encrypted',
             'tgl_transaksi' => 'date',
+            'tgl_jatuh_tempo' => 'date',
             'nominal_transaksi' => 'decimal:2',
             'diterima_at' => 'datetime',
             'diproses_at' => 'datetime',
@@ -69,6 +74,27 @@ class Pengaduan extends Model
             'ditolak_at' => 'datetime',
         ];
     }
+
+    public const DAFTAR_PRIORITAS = [
+        'Tinggi' => [
+            'label' => 'Tinggi / Darurat (Maks. 2 Hari)',
+            'sla_hari' => 2,
+            'keterangan' => 'Target Maks. 2 Hari Kerja (Uang ATM tidak keluar, kartu tertelan, dugaan fraud)',
+            'badge_bg' => 'bg-rose-100 text-rose-700 border-rose-200',
+        ],
+        'Sedang' => [
+            'label' => 'Sedang / Normal (Maks. 5 Hari)',
+            'sla_hari' => 5,
+            'keterangan' => 'Target Maks. 5 Hari Kerja (Transfer antar-bank pending, kendala QRIS/debit)',
+            'badge_bg' => 'bg-amber-100 text-amber-800 border-amber-200',
+        ],
+        'Rendah' => [
+            'label' => 'Rendah / Standar (Maks. 14 Hari)',
+            'sla_hari' => 14,
+            'keterangan' => 'Target Maks. 14 Hari Kerja (Administrasi buku, sengketa biaya admin, cetak rekening)',
+            'badge_bg' => 'bg-slate-100 text-slate-700 border-slate-200',
+        ],
+    ];
 
     protected static function booted(): void
     {
@@ -81,7 +107,112 @@ class Pengaduan extends Model
             if (empty($pengaduan->status)) {
                 $pengaduan->status = PengaduanStatus::Terkirim;
             }
+            if (empty($pengaduan->prioritas)) {
+                $pengaduan->prioritas = 'Sedang';
+            }
+            $pengaduan->tetapkanSla();
         });
+
+        static::updating(function (Pengaduan $pengaduan) {
+            if ($pengaduan->isDirty('prioritas')) {
+                $pengaduan->tetapkanSla();
+            }
+        });
+    }
+
+    /**
+     * Hitung durasi SLA hari dan tanggal jatuh tempo berdasarkan tingkat prioritas.
+     */
+    public function tetapkanSla(): void
+    {
+        $prioritas = $this->prioritas ?: 'Sedang';
+        $config = self::DAFTAR_PRIORITAS[$prioritas] ?? self::DAFTAR_PRIORITAS['Sedang'];
+
+        $this->sla_hari = $config['sla_hari'];
+
+        $basisTanggal = $this->created_at ? Carbon::parse($this->created_at) : now();
+        $this->tgl_jatuh_tempo = $basisTanggal->copy()->addWeekdays($this->sla_hari)->toDateString();
+    }
+
+    /**
+     * Hitung sisa hari sebelum jatuh tempo (bisa bernilai negatif jika terlambat).
+     */
+    public function sisaHariSla(): int
+    {
+        if (! $this->tgl_jatuh_tempo) {
+            return 0;
+        }
+
+        $target = Carbon::parse($this->tgl_jatuh_tempo)->endOfDay();
+        $hariIni = now()->startOfDay();
+
+        return (int) $hariIni->diffInDays($target, false);
+    }
+
+    /**
+     * Dapatkan status operasional SLA: 'selesai', 'overdue', 'urgent', 'aman'
+     */
+    public function statusSla(): string
+    {
+        if ($this->status === PengaduanStatus::Ditolak || $this->jurnal_id !== null) {
+            return 'selesai';
+        }
+
+        $sisa = $this->sisaHariSla();
+
+        if ($sisa < 0) {
+            return 'overdue';
+        }
+
+        if ($sisa <= 1) {
+            return 'urgent';
+        }
+
+        return 'aman';
+    }
+
+    /**
+     * Dapatkan rincian badge SLA untuk antarmuka tabel.
+     */
+    public function lencanaSla(): array
+    {
+        $status = $this->statusSla();
+        $sisa = $this->sisaHariSla();
+
+        if ($status === 'selesai') {
+            return [
+                'status' => 'selesai',
+                'label' => 'Selesai / Terproses',
+                'bg' => 'bg-slate-100 text-slate-600 border-slate-200',
+                'icon' => '✓',
+            ];
+        }
+
+        if ($status === 'overdue') {
+            $hariTelat = abs($sisa);
+            return [
+                'status' => 'overdue',
+                'label' => "Lewat SLA ({$hariTelat} Hari)",
+                'bg' => 'bg-rose-600 text-white border-rose-700 shadow-xs animate-pulse font-extrabold',
+                'icon' => '⚠',
+            ];
+        }
+
+        if ($status === 'urgent') {
+            return [
+                'status' => 'urgent',
+                'label' => $sisa === 0 ? 'Jatuh Tempo Hari Ini' : 'Sisa 1 Hari',
+                'bg' => 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
+                'icon' => '⏳',
+            ];
+        }
+
+        return [
+            'status' => 'aman',
+            'label' => "Sisa {$sisa} Hari",
+            'bg' => 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold',
+            'icon' => '⏱',
+        ];
     }
 
     // ==================== RELASI ====================

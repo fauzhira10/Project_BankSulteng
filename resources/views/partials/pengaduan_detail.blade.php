@@ -19,6 +19,16 @@
                 <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Nama Pelapor</span><span class="text-sm font-semibold text-slate-800">{{ $p->nama_pelapor }}</span></div>
                 <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Asal Cabang</span><span class="text-sm font-semibold text-slate-800">{{ $p->labelCabang() }}</span></div>
                 <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Tanggal Kirim</span><span class="text-sm font-semibold text-slate-800">{{ $p->created_at?->translatedFormat('d F Y, H:i') }}</span></div>
+                <div class="flex flex-col">
+                    <span class="text-xs text-slate-500 mb-0.5">Prioritas & SLA Target</span>
+                    @php $prioCfg = \App\Models\Pengaduan::DAFTAR_PRIORITAS[$p->prioritas ?? 'Sedang'] ?? \App\Models\Pengaduan::DAFTAR_PRIORITAS['Sedang']; @endphp
+                    <div>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border {{ $prioCfg['badge_bg'] }}">
+                            {{ $p->prioritas ?? 'Sedang' }} (Maks. {{ $p->sla_hari ?? 5 }} Hari)
+                        </span>
+                    </div>
+                </div>
+                <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Batas Jatuh Tempo</span><span class="text-sm font-bold font-mono text-navy">{{ $p->tgl_jatuh_tempo ? $p->tgl_jatuh_tempo->format('d/m/Y') : '-' }}</span></div>
                 <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Kategori</span><span class="text-sm font-semibold text-slate-800">{{ $p->kategori ?: '-' }}</span></div>
                 <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Sub Kategori</span><span class="text-sm font-semibold text-slate-800">{{ $p->sub_kategori ?: '-' }}</span></div>
                 <div class="flex flex-col"><span class="text-xs text-slate-500 mb-0.5">Sub Kategori 2</span><span class="text-sm font-semibold text-slate-800">{{ $p->sub_kategori_2 ?: '-' }}</span></div>
