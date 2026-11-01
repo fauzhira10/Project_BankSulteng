@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ProsesTambangBlockchainJob;
 use App\Models\BlokAudit;
 use App\Services\BlockchainAuditService;
 use App\Services\JangkarEthereumService;
 use App\Support\MerkleTree;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use RuntimeException;
 
@@ -51,6 +53,7 @@ class BlockchainController extends Controller
             'jangkar' => $ringkasJangkar,
             'ukuranBlok' => (int) config('blockchain.ukuran_blok'),
             'tingkatKesulitan' => (int) config('blockchain.tingkat_kesulitan'),
+            'antreanWorker' => DB::table('jobs')->count(),
         ]);
     }
 
@@ -87,8 +90,18 @@ class BlockchainController extends Controller
         ]);
     }
 
-    public function tambang(): RedirectResponse
+    public function tambang(Request $request): RedirectResponse
     {
+        // Komputasi Terdistribusi: Jika diminta secara asinkron (async), alihkan ke antrean background worker
+        if ($request->boolean('async')) {
+            ProsesTambangBlockchainJob::dispatch();
+
+            return back()->with(
+                'success',
+                'Tugas penambangan blok berhasil dikirim ke Antrean Pekerja Terdistribusi (Queue Worker). Jalankan "php artisan queue:work" di terminal untuk memproses tugas ini secara terpisah di latar belakang.'
+            );
+        }
+
         try {
             $baru = $this->blockchain->tambang();
         } catch (RuntimeException $e) {

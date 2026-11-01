@@ -56,6 +56,16 @@
                     @endif
                 </button>
             </form>
+            <form method="POST" action="{{ route('admin.blockchain.tambang', ['async' => 1]) }}" class="m-0 form-proses">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-slate-700 bg-amber-50 hover:bg-amber-100 border border-amber-300 shadow-xs transition-colors cursor-pointer" title="Kirim penambangan ke Antrean Pekerja Terdistribusi (Queue Worker)">
+                    <svg class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                    <span>Antrean Terdistribusi</span>
+                    @if(isset($antreanWorker) && $antreanWorker > 0)
+                        <span class="bg-amber-500 text-white px-1.5 rounded-md text-[0.71875rem] font-extrabold animate-pulse">{{ $antreanWorker }}</span>
+                    @endif
+                </button>
+            </form>
             <form method="POST" action="{{ route('admin.blockchain.jangkarkan') }}" class="m-0 form-proses">
                 @csrf
                 <button type="submit" @disabled(! $jangkar['aktif']) class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-white bg-navy hover:bg-navy-light shadow-sm transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" data-teks-proses="Mengirim ke Ethereum…" title="{{ $jangkar['aktif'] ? 'Kirim hash blok yang belum terjangkar ke kontrak Ethereum' : 'Penjangkaran Ethereum belum diaktifkan di .env' }}">
