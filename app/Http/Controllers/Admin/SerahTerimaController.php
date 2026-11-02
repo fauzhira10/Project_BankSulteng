@@ -29,15 +29,17 @@ class SerahTerimaController extends Controller
         $semuaSelesai = SerahTerimaService::ambilTiketSelesai()->get();
         $ringkasan = SerahTerimaService::kalkulasiTotal($semuaSelesai);
         $analitik = SerahTerimaService::kalkulasiAnalitik($semuaSelesai);
+        $petaPembukuan = SerahTerimaService::petaStatusPembukuan();
 
-        $cabangs = MasterCabang::orderBy('nama_cabang')->get();
+        $cabangs = MasterCabang::orderBy('kode_cabang')->get();
 
         return view('admin.serah_terima.index', [
             'tikets' => $tikets,
             'ringkasan' => $ringkasan,
             'analitik' => $analitik,
+            'petaPembukuan' => $petaPembukuan,
             'cabangs' => $cabangs,
-            'filters' => $request->only(['q', 'tgl_selesai', 'master_cabang_id']),
+            'filters' => $request->only(['q', 'tgl_selesai', 'master_cabang_id', 'status_pembukuan']),
         ]);
     }
 

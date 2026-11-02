@@ -142,8 +142,56 @@ class SerahTerimaService
             $query->where('master_cabang_id', $filters['master_cabang_id']);
         }
 
+        // 4. Filter Status Pembukuan (belum / sudah pernah masuk dokumen Serah Terima)
+        if (!empty($filters['status_pembukuan']) && in_array($filters['status_pembukuan'], ['belum', 'sudah'], true)) {
+            $sudahDibukukanIds = array_keys(self::petaStatusPembukuan());
+
+            if ($filters['status_pembukuan'] === 'sudah') {
+                $query->whereIn('id', !empty($sudahDibukukanIds) ? $sudahDibukukanIds : [-1]);
+            } elseif ($filters['status_pembukuan'] === 'belum' && !empty($sudahDibukukanIds)) {
+                $query->whereNotIn('id', $sudahDibukukanIds);
+            }
+        }
+
         // Urutkan dari penyelesaian terbaru
         return $query->orderByDesc('tgl_selesai')->orderByDesc('id');
+    }
+
+    /**
+     * Memetakan setiap ID jurnal yang sudah pernah masuk ke dokumen Serah Terima
+     * untuk deteksi anti-double booking (Sudah Dibukukan vs Belum Dibukukan).
+     *
+     * @return array<int, array{nomor_dokumen: string, tanggal_serah_terima: string, jumlah_dokumen: int}>
+     */
+    public static function petaStatusPembukuan(): array
+    {
+        $dokumens = SerahTerima::orderBy('id', 'asc')
+            ->get(['id', 'nomor_dokumen', 'tanggal_serah_terima', 'tiket_ids']);
+
+        $peta = [];
+
+        foreach ($dokumens as $dok) {
+            $ids = is_array($dok->tiket_ids) ? $dok->tiket_ids : [];
+            $tglStr = $dok->tanggal_serah_terima instanceof Carbon
+                ? $dok->tanggal_serah_terima->format('Y-m-d')
+                : (string) $dok->tanggal_serah_terima;
+
+            foreach ($ids as $rawId) {
+                $jurnalId = (int) $rawId;
+                if ($jurnalId <= 0) {
+                    continue;
+                }
+
+                $jumlahSebelumnya = $peta[$jurnalId]['jumlah_dokumen'] ?? 0;
+                $peta[$jurnalId] = [
+                    'nomor_dokumen' => (string) $dok->nomor_dokumen,
+                    'tanggal_serah_terima' => $tglStr,
+                    'jumlah_dokumen' => $jumlahSebelumnya + 1,
+                ];
+            }
+        }
+
+        return $peta;
     }
 
     /**

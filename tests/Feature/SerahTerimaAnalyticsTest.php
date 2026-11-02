@@ -213,3 +213,65 @@ test('halaman serah terima tampil bersih tanpa kartu analitik berlebihan dan mem
     $response->assertSee('Ekspor Excel Pembukuan');
     $response->assertSee('Cetak Lembar Serah Terima');
 });
+
+test('deteksi status pembukuan membedakan tiket yang sudah dibukukan dan belum dibukukan', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $cabang = MasterCabang::create(['kode_cabang' => '001', 'nama_cabang' => 'Cabang Utama Palu']);
+    $transaksi = MasterTransaksi::create(['jenis_transaksi' => 'ATM_TARIK TUNAI', 'channel' => 'ATM LOKAL']);
+
+    $jurnalSudah = Jurnal::create([
+        'master_cabang_id' => $cabang->id,
+        'master_transaksi_id' => $transaksi->id,
+        'no_tiket' => 'BS-202611020001',
+        'no_resi' => 'R-SUDAH',
+        'nama_nasabah' => 'Nasabah Sudah Dibukukan',
+        'no_rekening' => '001001',
+        'nominal_transaksi' => 1500000,
+        'status' => 'Done',
+        'tgl_transaksi' => '2026-11-01',
+        'tgl_terima' => '2026-11-01',
+        'tgl_selesai' => '2026-11-02',
+    ]);
+
+    $jurnalBelum = Jurnal::create([
+        'master_cabang_id' => $cabang->id,
+        'master_transaksi_id' => $transaksi->id,
+        'no_tiket' => 'BS-202611020002',
+        'no_resi' => 'R-BELUM',
+        'nama_nasabah' => 'Nasabah Belum Dibukukan',
+        'no_rekening' => '001002',
+        'nominal_transaksi' => 2500000,
+        'status' => 'CLOSED',
+        'tgl_transaksi' => '2026-11-01',
+        'tgl_terima' => '2026-11-01',
+        'tgl_selesai' => '2026-11-02',
+    ]);
+
+    // Buat dokumen serah terima untuk $jurnalSudah
+    $serahTerima = SerahTerimaService::buatSerahTerima([$jurnalSudah->id], \Carbon\Carbon::parse('2026-11-02'), $admin);
+
+    $peta = SerahTerimaService::petaStatusPembukuan();
+    expect($peta)->toHaveKey($jurnalSudah->id);
+    expect($peta[$jurnalSudah->id]['nomor_dokumen'])->toBe($serahTerima->nomor_dokumen);
+    expect($peta)->not->toHaveKey($jurnalBelum->id);
+
+    // Filter hanya yang belum dibukukan
+    $belumList = SerahTerimaService::ambilTiketSelesai(['status_pembukuan' => 'belum'])->pluck('id');
+    expect($belumList)->toContain($jurnalBelum->id);
+    expect($belumList)->not->toContain($jurnalSudah->id);
+
+    // Filter hanya yang sudah dibukukan
+    $sudahList = SerahTerimaService::ambilTiketSelesai(['status_pembukuan' => 'sudah'])->pluck('id');
+    expect($sudahList)->toContain($jurnalSudah->id);
+    expect($sudahList)->not->toContain($jurnalBelum->id);
+
+    // Pastikan badge tampil di halaman index
+    $response = $this->actingAs($admin)->get(route('admin.serah-terima.index'));
+    $response->assertOk();
+    $response->assertSee('Sudah Dibukukan');
+    $response->assertSee($serahTerima->nomor_dokumen);
+    $response->assertSee('Belum Dibukukan');
+    $response->assertSee('filterPembukuan', false);
+    $response->assertSee('filterSla', false);
+    $response->assertSee('filterCabang', false);
+});

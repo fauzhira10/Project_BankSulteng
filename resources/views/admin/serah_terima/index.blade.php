@@ -1,4 +1,4 @@
-@extends('layouts.app')
+ @extends('layouts.app')
 
 @section('title', 'Serah Terima Penyelesaian Nasabah')
 @section('page_title', 'Serah Terima Penyelesaian Pengaduan Nasabah')
@@ -162,6 +162,9 @@
 .sla-warn { background: #fef3c7; color: #92400e; }
 .sla-late { background: #fee2e2; color: #991b1b; }
 
+.book-unbooked { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.book-booked   { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
 .filter-inp {
     padding: .4rem .85rem;
     border-radius: 10px;
@@ -199,6 +202,9 @@
 @endpush
 
 @section('content')
+@php
+    $petaPembukuan = $petaPembukuan ?? [];
+@endphp
 <div class="max-w-[78.125rem] mx-auto space-y-5">
 
     {{-- === FORM + TABEL === --}}
@@ -207,7 +213,7 @@
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
 
             {{-- Filter Bar --}}
-            <div class="px-5 py-4 border-b border-slate-200 bg-slate-50">
+            <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 space-y-3">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="flex items-center gap-2">
@@ -237,6 +243,51 @@
                         </button>
                     </div>
                 </div>
+
+                {{-- Baris Filter Analitik & Deteksi Pembukuan --}}
+                <div class="pt-2.5 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2.5">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <span class="text-[0.72rem] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                            Filter &amp; Deteksi:
+                        </span>
+
+                        {{-- Filter Status Pembukuan (Anti-Double Booking) --}}
+                        <select id="filterPembukuan" class="filter-inp py-1.5 text-xs font-semibold text-slate-700" aria-label="Filter Status Pembukuan">
+                            <option value="">Semua Status Pembukuan</option>
+                            <option value="belum" @selected(($filters['status_pembukuan'] ?? '') === 'belum')>Belum Dibukukan</option>
+                            <option value="sudah" @selected(($filters['status_pembukuan'] ?? '') === 'sudah')>Sudah Dibukukan</option>
+                        </select>
+
+                        {{-- Filter Status SLA --}}
+                        <select id="filterSla" class="filter-inp py-1.5 text-xs font-semibold text-slate-700" aria-label="Filter Status SLA">
+                            <option value="">Semua Status SLA</option>
+                            <option value="tepat">Tepat Waktu (≤ 7h)</option>
+                            <option value="mendekati">Mendekati SLA (8–14h)</option>
+                            <option value="melewati">Melewati SLA (&gt; 14h)</option>
+                        </select>
+
+                        {{-- Filter Cabang --}}
+                        <select id="filterCabang" class="filter-inp py-1.5 text-xs font-semibold text-slate-700 max-w-52" aria-label="Filter Kantor Cabang">
+                            <option value="">Semua Kantor Cabang</option>
+                            @foreach($cabangs as $cb)
+                                <option value="{{ $cb->id }}" @selected((string) ($filters['master_cabang_id'] ?? '') === (string) $cb->id)>
+                                    {{ $cb->kode_cabang }} - {{ $cb->nama_cabang }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <button type="button" id="btnResetFilter" class="hidden text-xs font-bold text-rose-600 hover:text-rose-700 px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 cursor-pointer transition-colors">
+                            ✕ Reset Filter
+                        </button>
+                    </div>
+
+                    {{-- Peringatan Deteksi Double-Booking --}}
+                    <div id="doubleBookingAlert" class="hidden items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 border border-amber-300 text-amber-800 text-[0.72rem] font-bold">
+                        <span>⚠️</span>
+                        <span id="doubleBookingText">0 tiket terpilih sudah pernah dibukukan</span>
+                    </div>
+                </div>
             </div>
 
             {{-- Tabel --}}
@@ -254,6 +305,7 @@
                             <th class="py-3 px-4">Nama Nasabah</th>
                             <th class="py-3 px-4">No. Rekening</th>
                             <th class="py-3 px-4 text-right">Nominal</th>
+                            <th class="py-3 px-4 text-center">Status Pembukuan</th>
                             <th class="py-3 px-4 text-center">Status SLA</th>
                             <th class="py-3 px-4 text-center">Tgl. Selesai</th>
                         </tr>
@@ -265,23 +317,43 @@
                             if ($t->tgl_terima && $t->tgl_selesai) {
                                 $slaHari = \Carbon\Carbon::parse($t->tgl_terima)->diffInDays(\Carbon\Carbon::parse($t->tgl_selesai));
                             }
-                            $slaClass = 'sla-ok';  $slaLabel = 'Tepat Waktu';
-                            if ($slaHari > 14)     { $slaClass = 'sla-late'; $slaLabel = 'Melewati SLA'; }
-                            elseif ($slaHari > 7)  { $slaClass = 'sla-warn'; $slaLabel = 'Mendekati SLA'; }
+                            $slaClass = 'sla-ok';  $slaLabel = 'Tepat Waktu'; $slaKode = 'tepat';
+                            if ($slaHari > 14)     { $slaClass = 'sla-late'; $slaLabel = 'Melewati SLA'; $slaKode = 'melewati'; }
+                            elseif ($slaHari > 7)  { $slaClass = 'sla-warn'; $slaLabel = 'Mendekati SLA'; $slaKode = 'mendekati'; }
+
+                            $infoBuku = $petaPembukuan[$t->id] ?? null;
+                            $sudahDibukukan = $infoBuku !== null;
+                            $statusBukuKode = $sudahDibukukan ? 'sudah' : 'belum';
                         @endphp
                         <tr class="tr-tiket"
                             data-id="{{ $t->id }}"
                             data-nominal="{{ $t->nominal_transaksi }}"
                             data-nama="{{ strtolower($t->nama_nasabah) }}"
                             data-tiket="{{ strtolower($t->no_tiket ?? '') }}"
-                            data-rekening="{{ $t->no_rekening ?? '' }}">
+                            data-rekening="{{ $t->no_rekening ?? '' }}"
+                            data-cabang="{{ $t->master_cabang_id ?? '' }}"
+                            data-sla="{{ $slaKode }}"
+                            data-pembukuan="{{ $statusBukuKode }}">
                             <td class="py-3 px-4 text-center">
-                                <input type="checkbox" name="ids[]" value="{{ $t->id }}" class="cb-tiket" id="cb_{{ $t->id }}" checked>
+                                <input type="checkbox" name="ids[]" value="{{ $t->id }}" class="cb-tiket" id="cb_{{ $t->id }}" @checked(!$sudahDibukukan)>
                             </td>
                             <td class="py-3 px-4 font-mono font-bold text-navy text-[0.7rem]">{{ $t->no_tiket ?: '—' }}</td>
                             <td class="py-3 px-4 font-semibold text-slate-800">{{ $t->nama_nasabah }}</td>
                             <td class="py-3 px-4 font-mono text-slate-600">{{ $t->no_rekening ?: '—' }}</td>
                             <td class="py-3 px-4 text-right font-bold text-emerald-700 whitespace-nowrap">Rp {{ number_format($t->nominal_transaksi, 0, ',', '.') }}</td>
+                            <td class="py-3 px-4 text-center">
+                                @if($sudahDibukukan)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold book-booked"
+                                          title="Pernah dicetak pada dokumen {{ $infoBuku['nomor_dokumen'] }} ({{ $infoBuku['tanggal_serah_terima'] }})">
+                                        <span>✓ Sudah Dibukukan</span>
+                                        <span class="font-mono text-[0.62rem] opacity-85">({{ $infoBuku['nomor_dokumen'] }})</span>
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold book-unbooked">
+                                        Belum Dibukukan
+                                    </span>
+                                @endif
+                            </td>
                             <td class="py-3 px-4 text-center">
                                 <span class="px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold uppercase {{ $slaClass }}">
                                     {{ $slaLabel }}@if($slaHari !== null) ({{ $slaHari }}h)@endif
@@ -293,7 +365,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="py-12 text-center">
+                            <td colspan="8" class="py-12 text-center">
                                 <div class="flex flex-col items-center gap-2 text-slate-400">
                                     <svg class="w-10 h-10 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                                     <span class="text-sm font-medium">Belum ada tiket selesai yang siap diserahterimakan.</span>
@@ -331,25 +403,57 @@
 <script>
 /* ============================================================
    SERAH TERIMA — Interactive JS
-   Live Floating Summary + Check-All + Live Search
+   Live Floating Summary + Check-All + Multi-Filter & Deteksi
 ============================================================ */
 (function () {
     'use strict';
 
-    const tbody      = document.getElementById('tbodyTiket');
-    const btnAll     = document.getElementById('btnCheckAll');
-    const lblAll     = document.getElementById('lblCheckAll');
-    const floatBar   = document.getElementById('floatingSummary');
-    const badgeCount = document.getElementById('fsBadgeCount');
-    const badgeTotal = document.getElementById('fsBadgeTotal');
-    const btnHdr      = document.getElementById('btnCetakHeader');
-    const btnExcelHdr = document.getElementById('btnExportExcelHeader');
-    const srch        = document.getElementById('inputSearch');
+    const tbody         = document.getElementById('tbodyTiket');
+    const btnAll        = document.getElementById('btnCheckAll');
+    const lblAll        = document.getElementById('lblCheckAll');
+    const floatBar      = document.getElementById('floatingSummary');
+    const badgeCount    = document.getElementById('fsBadgeCount');
+    const badgeTotal    = document.getElementById('fsBadgeTotal');
+    const btnHdr        = document.getElementById('btnCetakHeader');
+    const btnExcelHdr   = document.getElementById('btnExportExcelHeader');
+    const srch          = document.getElementById('inputSearch');
+    const fltPembukuan  = document.getElementById('filterPembukuan');
+    const fltSla        = document.getElementById('filterSla');
+    const fltCabang     = document.getElementById('filterCabang');
+    const btnResetFlt   = document.getElementById('btnResetFilter');
+    const dblAlert      = document.getElementById('doubleBookingAlert');
+    const dblAlertText  = document.getElementById('doubleBookingText');
 
     function cbs()      { return Array.from(tbody.querySelectorAll('.cb-tiket')); }
     function visible(c) { const r = c.closest('tr'); return r && r.style.display !== 'none'; }
 
     function rupiah(n)  { return 'Rp ' + new Intl.NumberFormat('id-ID').format(n); }
+
+    function applyFilters() {
+        const q       = (srch?.value ?? '').toLowerCase().trim();
+        const fBuku   = fltPembukuan?.value ?? '';
+        const fSla    = fltSla?.value ?? '';
+        const fCabang = fltCabang?.value ?? '';
+
+        const hasFilter = Boolean(q || fBuku || fSla || fCabang);
+        if (btnResetFlt) {
+            btnResetFlt.classList.toggle('hidden', !hasFilter);
+        }
+
+        tbody.querySelectorAll('tr.tr-tiket').forEach(row => {
+            const matchKeyword = !q
+                || (row.dataset.nama     ?? '').includes(q)
+                || (row.dataset.tiket    ?? '').includes(q)
+                || (row.dataset.rekening ?? '').includes(q);
+            const matchBuku   = !fBuku   || (row.dataset.pembukuan ?? '') === fBuku;
+            const matchSla    = !fSla    || (row.dataset.sla       ?? '') === fSla;
+            const matchCabang = !fCabang || (row.dataset.cabang    ?? '') === fCabang;
+
+            row.style.display = (matchKeyword && matchBuku && matchSla && matchCabang) ? '' : 'none';
+        });
+
+        update();
+    }
 
     function update() {
         const all      = cbs();
@@ -357,12 +461,24 @@
         const checked  = shown.filter(c => c.checked);
         const count    = checked.length;
         const total    = checked.reduce((s, c) => s + parseFloat(c.closest('tr')?.dataset?.nominal ?? 0), 0);
+        const bookedSelected = checked.filter(c => c.closest('tr')?.dataset?.pembukuan === 'sudah').length;
 
         badgeCount.textContent = count;
         badgeTotal.textContent = rupiah(total);
         floatBar.classList.toggle('visible', count > 0);
         if (btnHdr) btnHdr.disabled = count === 0;
         if (btnExcelHdr) btnExcelHdr.disabled = count === 0;
+
+        if (dblAlert && dblAlertText) {
+            if (bookedSelected > 0) {
+                dblAlertText.textContent = bookedSelected + ' tiket terpilih sudah pernah dibukukan';
+                dblAlert.classList.remove('hidden');
+                dblAlert.classList.add('inline-flex');
+            } else {
+                dblAlert.classList.add('hidden');
+                dblAlert.classList.remove('inline-flex');
+            }
+        }
 
         const allChk = shown.length > 0 && shown.every(c => c.checked);
         btnAll.classList.toggle('all-checked', allChk);
@@ -394,20 +510,21 @@
         update();
     });
 
-    /* Live Search */
-    srch.addEventListener('input', function () {
-        const q = this.value.toLowerCase().trim();
-        tbody.querySelectorAll('tr.tr-tiket').forEach(row => {
-            const match = !q
-                || (row.dataset.nama    ?? '').includes(q)
-                || (row.dataset.tiket   ?? '').includes(q)
-                || (row.dataset.rekening ?? '').includes(q);
-            row.style.display = match ? '' : 'none';
-        });
-        update();
+    /* Live Search & Dropdown Filters */
+    srch?.addEventListener('input', applyFilters);
+    fltPembukuan?.addEventListener('change', applyFilters);
+    fltSla?.addEventListener('change', applyFilters);
+    fltCabang?.addEventListener('change', applyFilters);
+
+    btnResetFlt?.addEventListener('click', () => {
+        if (srch) srch.value = '';
+        if (fltPembukuan) fltPembukuan.value = '';
+        if (fltSla) fltSla.value = '';
+        if (fltCabang) fltCabang.value = '';
+        applyFilters();
     });
 
-    update(); // inisialisasi awal
+    applyFilters(); // inisialisasi awal
     window.serahTerimaUpdate = update;
 })();
 </script>
