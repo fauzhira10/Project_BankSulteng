@@ -1533,6 +1533,8 @@ class JurnalController extends Controller
      */
     public function importExcel(Request $request)
     {
+         ini_set('memory_limit', '512M');
+
         $request->validate([
             'file_excel' => 'required|file|mimes:xlsx,xls,csv,txt|max:51200',
         ], [
