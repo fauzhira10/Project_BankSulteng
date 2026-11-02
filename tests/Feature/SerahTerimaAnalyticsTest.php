@@ -202,15 +202,14 @@ test('kalkulasi analitik menghitung metrik kepatuhan sla dan distribusi channel 
     expect($analitik['channels']['QRIS']['persentase'])->toBe(10.0);
 });
 
-test('halaman serah terima menampilkan 3 kartu rekap analitik dan tombol ekspor excel', function () {
+test('halaman serah terima tampil bersih tanpa kartu analitik berlebihan dan memuat tombol ekspor excel', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $response = $this->actingAs($admin)->get(route('admin.serah-terima.index'));
 
     $response->assertOk();
-    $response->assertViewHas('analitik');
-    $response->assertSee('Volume & Nilai Pembukuan');
-    $response->assertSee('Kepatuhan SLA (Resolution Performance)');
-    $response->assertSee('Distribusi Channel Transaksi');
+    $response->assertDontSee('Kepatuhan SLA (Resolution Performance)');
+    $response->assertDontSee('Distribusi Channel Transaksi');
     $response->assertSee('Ekspor Excel Pembukuan');
+    $response->assertSee('Cetak Lembar Serah Terima');
 });
