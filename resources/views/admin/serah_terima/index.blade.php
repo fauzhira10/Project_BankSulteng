@@ -84,6 +84,67 @@
 }
 .btn-cetak-float:hover { filter: brightness(1.1); transform: scale(1.03); }
 
+/* Tombol Aksi Header: Excel & Cetak */
+.btn-excel-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #059669;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #ffffff !important;
+    border: 1px solid #047857;
+    border-radius: 12px;
+    padding: 9px 18px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(5, 150, 105, 0.35);
+    transition: all 0.2s ease;
+}
+.btn-excel-head:hover:not(:disabled) {
+    background: linear-gradient(135deg, #047857 0%, #059669 100%);
+    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.45);
+    transform: translateY(-1px);
+}
+.btn-excel-head:disabled {
+    background: #e2e8f0 !important;
+    color: #64748b !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.btn-cetak-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #0f2a5e;
+    background: linear-gradient(135deg, #0f2a5e 0%, #1e40af 100%);
+    color: #ffffff !important;
+    border: 1px solid #1e3a8a;
+    border-radius: 12px;
+    padding: 9px 18px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(15, 42, 94, 0.35);
+    transition: all 0.2s ease;
+}
+.btn-cetak-head:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0b1f44 0%, #172554 100%);
+    box-shadow: 0 5px 15px rgba(15, 42, 94, 0.45);
+    transform: translateY(-1px);
+}
+.btn-cetak-head:disabled {
+    background: #e2e8f0 !important;
+    color: #64748b !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
 .cb-tiket {
     width: 1.1rem;
     height: 1.1rem;
@@ -243,19 +304,19 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap items-center gap-2.5">
-                        <button type="submit" id="btnExportCsvHeader"
-                                formaction="{{ route('admin.serah-terima.export_csv') }}"
+                        <button type="submit" id="btnExportExcelHeader"
+                                formaction="{{ route('admin.serah-terima.export_excel') }}"
                                 formtarget="_self"
-                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs shadow-md hover:opacity-95 hover:scale-[1.02] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                class="btn-excel-head"
                                 disabled>
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            📥 Ekspor CSV Pembukuan
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>📗 Ekspor Excel Pembukuan (.xlsx)</span>
                         </button>
                         <button type="submit" id="btnCetakHeader"
-                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-navy to-brand-blue text-white font-bold text-xs shadow-md hover:opacity-95 hover:scale-[1.02] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                class="btn-cetak-head"
                                 disabled>
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                            🖨️ Cetak Lembar Serah Terima
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                            <span>🖨️ Cetak Lembar Serah Terima</span>
                         </button>
                     </div>
                 </div>
@@ -364,9 +425,9 @@
     const floatBar   = document.getElementById('floatingSummary');
     const badgeCount = document.getElementById('fsBadgeCount');
     const badgeTotal = document.getElementById('fsBadgeTotal');
-    const btnHdr     = document.getElementById('btnCetakHeader');
-    const btnCsvHdr  = document.getElementById('btnExportCsvHeader');
-    const srch       = document.getElementById('inputSearch');
+    const btnHdr      = document.getElementById('btnCetakHeader');
+    const btnExcelHdr = document.getElementById('btnExportExcelHeader');
+    const srch        = document.getElementById('inputSearch');
 
     function cbs()      { return Array.from(tbody.querySelectorAll('.cb-tiket')); }
     function visible(c) { const r = c.closest('tr'); return r && r.style.display !== 'none'; }
@@ -384,7 +445,7 @@
         badgeTotal.textContent = rupiah(total);
         floatBar.classList.toggle('visible', count > 0);
         if (btnHdr) btnHdr.disabled = count === 0;
-        if (btnCsvHdr) btnCsvHdr.disabled = count === 0;
+        if (btnExcelHdr) btnExcelHdr.disabled = count === 0;
 
         const allChk = shown.length > 0 && shown.every(c => c.checked);
         btnAll.classList.toggle('all-checked', allChk);

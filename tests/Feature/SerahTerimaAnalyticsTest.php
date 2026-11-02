@@ -73,6 +73,35 @@ test('ekspor csv gagal validasi apabila tidak ada tiket yang dipilih', function 
     $response->assertSessionHasErrors('ids');
 });
 
+test('ekspor excel pembukuan menghasilkan file xlsx resmi dengan tabel bergaris', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $cabang = MasterCabang::create(['kode_cabang' => '001', 'nama_cabang' => 'Cabang Utama Palu']);
+    $transaksi = MasterTransaksi::create(['jenis_transaksi' => 'ATM_TARIK TUNAI', 'channel' => 'ATM LOKAL']);
+
+    $jurnal = Jurnal::create([
+        'master_cabang_id' => $cabang->id,
+        'master_transaksi_id' => $transaksi->id,
+        'no_tiket' => 'BS-202609030021',
+        'no_resi' => 'RESI001',
+        'nama_nasabah' => 'Musdalifah',
+        'no_rekening' => '0010205293011',
+        'nominal_transaksi' => 3750000,
+        'status' => 'CLOSED',
+        'tgl_transaksi' => '2026-09-03',
+        'tgl_terima' => '2026-09-03',
+        'tgl_selesai' => '2026-09-05',
+    ]);
+
+    $response = $this->actingAs($admin)->post(route('admin.serah-terima.export_excel'), [
+        'ids' => [$jurnal->id],
+        'tanggal_serah_terima' => '2026-09-18',
+    ]);
+
+    $response->assertOk();
+    expect($response->headers->get('content-type'))->toContain('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    expect($response->headers->get('content-disposition'))->toContain('attachment; filename="Serah_Terima_Pembukuan_');
+});
+
 test('kalkulasi analitik menghitung metrik kepatuhan sla dan distribusi channel dengan akurat', function () {
     $cabang = MasterCabang::create(['kode_cabang' => '001', 'nama_cabang' => 'Cabang Utama Palu']);
 
@@ -173,7 +202,7 @@ test('kalkulasi analitik menghitung metrik kepatuhan sla dan distribusi channel 
     expect($analitik['channels']['QRIS']['persentase'])->toBe(10.0);
 });
 
-test('halaman serah terima menampilkan 3 kartu rekap analitik dan tombol ekspor csv', function () {
+test('halaman serah terima menampilkan 3 kartu rekap analitik dan tombol ekspor excel', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $response = $this->actingAs($admin)->get(route('admin.serah-terima.index'));
@@ -183,5 +212,5 @@ test('halaman serah terima menampilkan 3 kartu rekap analitik dan tombol ekspor 
     $response->assertSee('Volume & Nilai Pembukuan');
     $response->assertSee('Kepatuhan SLA (Resolution Performance)');
     $response->assertSee('Distribusi Channel Transaksi');
-    $response->assertSee('Ekspor CSV Pembukuan');
+    $response->assertSee('Ekspor Excel Pembukuan');
 });

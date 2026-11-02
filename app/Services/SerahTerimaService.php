@@ -10,6 +10,11 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class SerahTerimaService
 {
@@ -345,5 +350,173 @@ class SerahTerimaService
         $lines[] = ',,,,"Yang Menerima,",,,,';
 
         return implode("\n", $lines) . "\n";
+    }
+
+    /**
+     * Menghasilkan berkas Spreadsheet Excel (.xlsx) resmi dengan tabel bergaris,
+     * kop dokumen Bank Sulteng, format nominal Rupiah, dan kolom tanda tangan.
+     *
+     * @param iterable|Collection|array $jurnals
+     */
+    public static function generateExcelPembukuan($jurnals, ?Carbon $tanggal = null): Spreadsheet
+    {
+        $tgl = $tanggal ? $tanggal->copy() : now();
+        $tanggalIndonesia = strtoupper($tgl->locale('id')->translatedFormat('d F Y'));
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('SERAH TERIMA');
+        $sheet->setShowGridLines(true);
+
+        // 1. Header Judul Dokumen (Baris 1 & 2)
+        $sheet->setCellValue('A1', 'SERAH TERIMA PENYELESAIAN NASABAH');
+        $sheet->mergeCells('A1:F1');
+        $sheet->getStyle('A1')->getFont()->setName('Arial')->setSize(13)->setBold(true)->getColor()->setRGB('0B2F64');
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->setCellValue('A2', "PER TANGGAL {$tanggalIndonesia}");
+        $sheet->mergeCells('A2:F2');
+        $sheet->getStyle('A2')->getFont()->setName('Arial')->setSize(11)->setBold(true)->getColor()->setRGB('1E293B');
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // 2. Header Tabel (Baris 4)
+        $headers = [
+            'A4' => 'No.',
+            'B4' => 'Nomor Tiket',
+            'C4' => 'Nama',
+            'D4' => 'Nomor Rekening',
+            'E4' => 'Nominal',
+            'F4' => 'Keterangan',
+        ];
+
+        foreach ($headers as $cell => $val) {
+            $sheet->setCellValue($cell, $val);
+        }
+
+        $headerStyle = [
+            'font' => ['name' => 'Arial', 'size' => 10, 'bold' => true, 'color' => ['rgb' => '0F172A']],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E2E8F0'],
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ];
+        $sheet->getStyle('A4:F4')->applyFromArray($headerStyle);
+        $sheet->getRowDimension(4)->setRowHeight(24);
+
+        // 3. Baris Data (Mulai Baris 5)
+        $row = 5;
+        $no = 1;
+        $totalNominal = 0;
+
+        foreach ($jurnals as $jurnal) {
+            $noTiket = is_object($jurnal) ? ($jurnal->no_tiket ?? '') : ($jurnal['no_tiket'] ?? '');
+            $nama = is_object($jurnal) ? ($jurnal->nama_nasabah ?? '') : ($jurnal['nama_nasabah'] ?? '');
+            $noRekening = is_object($jurnal) ? ($jurnal->no_rekening ?? '') : ($jurnal['no_rekening'] ?? '');
+            $nominal = (float) (is_object($jurnal) ? ($jurnal->nominal_transaksi ?? 0) : ($jurnal['nominal_transaksi'] ?? 0));
+            $totalNominal += $nominal;
+
+            $sheet->setCellValue('A' . $row, $no);
+            $sheet->setCellValueExplicit('B' . $row, (string) $noTiket, DataType::TYPE_STRING);
+            $sheet->setCellValue('C' . $row, strtoupper((string) $nama));
+            $sheet->setCellValueExplicit('D' . $row, (string) $noRekening, DataType::TYPE_STRING);
+            $sheet->setCellValue('E' . $row, $nominal);
+            $sheet->setCellValue('F' . $row, 'CLOSED');
+
+            // Format sel
+            $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('B' . $row)->getFont()->setBold(true);
+            $sheet->getStyle('D' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('E' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('E' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle('F' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('F' . $row)->getFont()->setBold(true);
+
+            $sheet->getStyle("A{$row}:F{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle("A{$row}:F{$row}")->getFont()->setName('Arial')->setSize(10);
+            $sheet->getRowDimension($row)->setRowHeight(20);
+
+            $no++;
+            $row++;
+        }
+
+        // 4. Baris Total (Row $row)
+        $sheet->setCellValue('A' . $row, 'TOTAL DIBUKUKAN:');
+        $sheet->mergeCells("A{$row}:D{$row}");
+        $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle("A{$row}")->getFont()->setBold(true);
+
+        $sheet->setCellValue('E' . $row, $totalNominal);
+        $sheet->getStyle('E' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('E' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('E' . $row)->getFont()->setBold(true);
+
+        $sheet->setCellValue('F' . $row, 'CLOSED');
+        $sheet->getStyle('F' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F' . $row)->getFont()->setBold(true);
+
+        $sheet->getStyle("A{$row}:F{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle("A{$row}:F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F8FAFC');
+        $sheet->getRowDimension($row)->setRowHeight(22);
+
+        // 5. Mandat Pembukuan
+        $row += 2;
+        $sheet->setCellValue("A{$row}", "MOHON UNTUK DIBUKUKAN HARI INI {$tanggalIndonesia}");
+        $sheet->mergeCells("A{$row}:F{$row}");
+        $sheet->getStyle("A{$row}")->getFont()->setName('Arial')->setSize(11)->setBold(true)->getColor()->setRGB('0F172A');
+
+        // 6. Tanda Tangan Pejabat
+        $row += 2;
+        $sheet->setCellValue("A{$row}", 'Yang Menyerahkan,');
+        $sheet->mergeCells("A{$row}:C{$row}");
+        $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A{$row}")->getFont()->setBold(true);
+
+        $sheet->setCellValue("D{$row}", 'Yang Menerima,');
+        $sheet->mergeCells("D{$row}:F{$row}");
+        $sheet->getStyle("D{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("D{$row}")->getFont()->setBold(true);
+
+        $row++;
+        $sheet->setCellValue("A{$row}", 'Staf Layanan Keluhan & Monitoring Transaksi Kartu');
+        $sheet->mergeCells("A{$row}:C{$row}");
+        $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A{$row}")->getFont()->setSize(9)->getColor()->setRGB('64748B');
+
+        $sheet->setCellValue("D{$row}", 'Bagian Pembukuan / Operasional PT Bank Sulteng');
+        $sheet->mergeCells("D{$row}:F{$row}");
+        $sheet->getStyle("D{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("D{$row}")->getFont()->setSize(9)->getColor()->setRGB('64748B');
+
+        // Ruang Tanda Tangan
+        $row += 4;
+        $sheet->setCellValue("A{$row}", 'MUJADID');
+        $sheet->mergeCells("A{$row}:C{$row}");
+        $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A{$row}")->getFont()->setBold(true)->setUnderline(true);
+
+        $sheet->setCellValue("D{$row}", '( .................................................. )');
+        $sheet->mergeCells("D{$row}:F{$row}");
+        $sheet->getStyle("D{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("D{$row}")->getFont()->setBold(true);
+
+        // Lebar Kolom
+        $sheet->getColumnDimension('A')->setWidth(7);
+        $sheet->getColumnDimension('B')->setWidth(26);
+        $sheet->getColumnDimension('C')->setWidth(34);
+        $sheet->getColumnDimension('D')->setWidth(24);
+        $sheet->getColumnDimension('E')->setWidth(18);
+        $sheet->getColumnDimension('F')->setWidth(16);
+
+        return $spreadsheet;
     }
 }

@@ -300,21 +300,10 @@
             {{-- Kiri: Yang Menyerahkan --}}
             <div class="ttd-col">
                 <div class="ttd-title">Yang Menyerahkan,</div>
-                <div class="ttd-jabatan">Staf Layanan Keluhan &amp; Monitoring Transaksi Kartu</div>
+                <div class="ttd-jabatan">Staf Layanan Keluhan & Monitoring Transaksi Kartu</div>
                 <div class="ttd-space"></div>
-                @php
-                    // getAktifGrouped() mengembalikan Collection per slot, ambil elemen pertama
-                    $penyerah = isset($pejabatTtd[1]) && $pejabatTtd[1] instanceof \Illuminate\Database\Eloquent\Collection
-                        ? $pejabatTtd[1]->first()
-                        : ($pejabatTtd[1] ?? null);
-                @endphp
-                <div class="ttd-nama">
-                    {{ $penyerah?->nama ?? 'MUJADID' }}
-                </div>
-                <div class="ttd-sub">
-                    @if($penyerah?->nip) NIP. {{ $penyerah->nip }} @endif
-                    Staf Layanan Keluhan
-                </div>
+                <div class="ttd-nama">MUJADID</div>
+                <div class="ttd-sub">Staf Layanan Keluhan</div>
             </div>
 
             {{-- Kanan: Yang Menerima --}}

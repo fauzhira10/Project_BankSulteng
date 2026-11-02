@@ -10,6 +10,8 @@ use App\Models\SerahTerima;
 use App\Services\SerahTerimaService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SerahTerimaController extends Controller
 {
@@ -147,6 +149,51 @@ class SerahTerimaController extends Controller
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             'Cache-Control' => 'no-store, no-cache, must-revalidate',
+        ]);
+    }
+
+    /**
+     * Mengekspor data tiket terpilih ke dalam berkas Excel (.xlsx) resmi dengan tabel bergaris Bank Sulteng.
+     */
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer',
+            'tanggal_serah_terima' => 'nullable|date',
+        ], [
+            'ids.required' => 'Pilih minimal satu tiket pengaduan untuk diekspor ke Excel.',
+            'ids.min' => 'Pilih minimal satu tiket pengaduan untuk diekspor ke Excel.',
+        ]);
+
+        $ids = array_values(array_map('intval', $request->input('ids', [])));
+
+        $jurnals = Jurnal::with(['masterCabang', 'masterTransaksi', 'pengaduan'])
+            ->whereIn('id', $ids)
+            ->orderBy('tgl_selesai')
+            ->orderBy('id')
+            ->get();
+
+        if ($jurnals->isEmpty()) {
+            return redirect()
+                ->route('admin.serah-terima.index')
+                ->with('error', 'Tiket yang dipilih tidak ditemukan atau belum selesai.');
+        }
+
+        $tanggalInput = $request->filled('tanggal_serah_terima')
+            ? Carbon::parse($request->input('tanggal_serah_terima'))
+            : now();
+
+        $spreadsheet = SerahTerimaService::generateExcelPembukuan($jurnals, $tanggalInput);
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Serah_Terima_Pembukuan_' . $tanggalInput->format('Ymd_His') . '.xlsx';
+
+        return new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output');
+        }, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'max-age=0',
         ]);
     }
 }
