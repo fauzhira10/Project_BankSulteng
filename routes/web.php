@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\BlockchainController;
 use App\Http\Controllers\Admin\PejabatTtdController;
 use App\Http\Controllers\Admin\PengaduanMasukController;
 use App\Http\Controllers\Admin\PenggunaController;
+use App\Http\Controllers\Admin\SerahTerimaController;
 use App\Http\Controllers\AtmMonitoringController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Cs\DashboardController as CsDashboardController;
@@ -130,6 +131,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // API AJAX Pejabat & Snapshot TTD Jurnal
     Route::get('/api/pejabat-ttd/slot/{slot}', [PejabatTtdController::class, 'apiBySlot'])->name('api.pejabat_ttd.slot')->whereNumber('slot');
     Route::post('/api/jurnal/{id}/ttd', [PejabatTtdController::class, 'simpanTtdJurnal'])->name('api.jurnal.simpan_ttd')->whereNumber('id');
+
+    // ---------- Serah Terima Penyelesaian Nasabah ----------
+    Route::prefix('serah-terima')->name('admin.serah-terima.')->group(function () {
+        Route::get('/', [SerahTerimaController::class, 'index'])->name('index');
+        Route::post('/cetak', [SerahTerimaController::class, 'cetak'])->name('cetak');
+    });
 
     // ---------- Blockchain Jejak Audit (Block Explorer) ----------
     Route::prefix('blockchain')->name('admin.blockchain.')->group(function () {

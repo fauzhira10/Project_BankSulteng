@@ -769,7 +769,19 @@ php artisan dw:sync --fresh
 
 Pipeline ini juga dijadwalkan secara otomatis setiap dini hari pukul 02:00 WITA melalui `routes/console.php`.
 
-### 8.13 Yang belum dikerjakan
+### 8.13 Modul Serah Terima Penyelesaian Nasabah (Berita Acara Pembukuan)
+
+Modul ini memfasilitasi serah terima resmi atas tiket pengaduan nasabah yang telah berstatus `Done` / `CLOSED` / `Success` antara Unit Layanan Keluhan & Monitoring Transaksi Kartu ke Bagian Pembukuan / Operasional PT Bank Sulteng untuk eksekusi pengembalian dana nasabah.
+
+#### 1. Komponen Utama
+* **Migration & Tabel**: `serah_terimas` (`nomor_dokumen`, `tanggal_serah_terima`, `total_tiket`, `total_nominal`, `tiket_ids`, `blockchain_hash`, `created_by`).
+* **Model**: [`App\Models\SerahTerima`](file:///c:/laragon/www/EJurnal_Keluhan/app/Models/SerahTerima.php).
+* **Service**: [`App\Services\SerahTerimaService`](file:///c:/laragon/www/EJurnal_Keluhan/app/Services/SerahTerimaService.php) (Penomoran dokumen resmi `ST/YYYYMMDD/XXXX`, agregasi kalkulasi nominal & tiket, penguncian SHA-256 hash blockchain, dan query tiket selesai).
+* **Controller**: [`App\Http\Controllers\Admin\SerahTerimaController`](file:///c:/laragon/www/EJurnal_Keluhan/app/Http/Controllers/Admin/SerahTerimaController.php) (`index` dan `cetak`).
+* **Routing**: `Route::prefix('serah-terima')->name('admin.serah-terima.')` (`index` dan `cetak`).
+* **Integritas Blockchain**: Setiap lembar serah terima menyertakan SHA-256 hash yang merantaikan data nomor dokumen, total uang, dan hash blok audit sebelumnya.
+
+### 8.14 Yang belum dikerjakan
 
 Butir berikut sudah teridentifikasi namun **belum** ada di dalam kode:
 
