@@ -109,7 +109,19 @@
             <span>Rekap Laporan Keluhan</span>
         </a>
 
-        <!-- Menu 6: Daftar Tanda Tangan -->
+        <!-- Menu 6: Serah Terima Penyelesaian Nasabah -->
+        <a href="{{ route('admin.serah-terima.index') }}" class="{{ $navBase }} {{ request()->routeIs('admin.serah-terima.*') ? $navActive : $navIdle }}">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                <line x1="9" y1="12" x2="15" y2="12"></line>
+                <line x1="9" y1="16" x2="13" y2="16"></line>
+                <polyline points="9 8 10 9 12 7"></polyline>
+            </svg>
+            <span>Serah Terima</span>
+        </a>
+
+        <!-- Menu 7: Daftar Tanda Tangan -->
         <a href="{{ route('admin.pejabat-ttd.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[0.84375rem] font-medium transition-all duration-200 {{ request()->routeIs('admin.pejabat-ttd.*') ? 'text-white bg-gradient-to-r from-brand-blue to-navy-light font-semibold shadow-lg shadow-brand-blue/30 relative before:content-[\'\'] before:absolute before:left-0 before:top-[15%] before:h-[70%] before:w-1 before:bg-brand-gold before:rounded-r' : 'text-slate-300 hover:text-white hover:bg-white/10 hover:translate-x-1' }}">
             <svg class="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 19l7-7 3 3-7 7-3-3z"></path>

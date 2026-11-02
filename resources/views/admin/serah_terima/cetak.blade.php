@@ -3,225 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SERAH TERIMA PENYELESAIAN NASABAH - {{ $tanggalIndonesia ?? date('d F Y') }}</title>
+    <title>SERAH TERIMA PENYELESAIAN NASABAH — {{ $tanggalIndonesia ?? strtoupper(date('d F Y')) }}</title>
+    <meta name="description" content="Dokumen Resmi Serah Terima Penyelesaian Pengaduan Nasabah PT Bank Sulteng — {{ $nomorDokumen ?? '' }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <style>
-        * {
+        /* ============================================================
+           SERAH TERIMA — Layout Cetak A4 Resmi
+           PT Bank Pembangunan Daerah Sulawesi Tengah
+           Standar Kerja Operasional | Layanan Keluhan Nasabah
+        ============================================================ */
+
+        *, *::before, *::after {
             box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 11px;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
         body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
             background-color: #f1f5f9;
             margin: 0;
-            padding: 20px;
+            padding: 18px 16px 80px;
             color: #000;
         }
 
-        .no-print {
+        /* ─── Toolbar (hilang saat cetak) ─────────────────────── */
+        .toolbar {
             max-width: 210mm;
-            margin: 0 auto 15px auto;
+            margin: 0 auto 14px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
             background: #ffffff;
             padding: 10px 16px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0,0,0,.06);
         }
+        .toolbar-info {
+            font-size: 11px;
+            color: #475569;
+        }
+        .toolbar-info strong { color: #0f172a; }
+        .toolbar-actions { display: flex; gap: 8px; }
 
         .btn {
-            padding: 7px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 12px;
+            padding: 7px 16px;
+            border-radius: 7px;
+            font-weight: 700;
+            font-size: 11px;
             cursor: pointer;
             border: none;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            transition: filter .15s, transform .12s;
         }
+        .btn:hover { filter: brightness(1.08); transform: scale(1.02); }
+        .btn-back  { background: #475569; color: #fff; }
+        .btn-print { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; box-shadow: 0 3px 10px rgba(37,99,235,.3); }
 
-        .btn-back { background: #475569; color: #fff; }
-        .btn-print { background: #1e3a8a; color: #fff; }
-
+        /* ─── Kertas A4 ────────────────────────────────────────── */
         .sheet-a4 {
             background: #ffffff;
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto;
-            padding: 15mm 20mm;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 16mm 20mm 12mm;
+            box-shadow: 0 4px 20px rgba(0,0,0,.09);
+            position: relative;
         }
 
-        .title-header {
+        /* ─── Kop Dokumen ──────────────────────────────────────── */
+        .doc-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 2.5px solid #000;
         }
-
-        .title-header h2 {
-            font-size: 14px;
+        .doc-title {
+            font-size: 15px;
             font-weight: bold;
-            margin: 0 0 5px 0;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin: 0 0 5px;
         }
-
-        .title-header h3 {
+        .doc-subtitle {
             font-size: 12px;
             font-weight: bold;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin: 0 0 3px;
+        }
+        .doc-nomor {
+            font-size: 10px;
+            color: #475569;
             margin: 0;
         }
 
-        .table-data {
+        /* ─── Tabel Utama ──────────────────────────────────────── */
+        .tbl {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
-
-        .table-data th, .table-data td {
+        .tbl th,
+        .tbl td {
             border: 1px solid #000;
-            padding: 4px 6px;
+            padding: 5px 7px;
+            vertical-align: middle;
         }
-
-        .table-data th {
-            background-color: #f8fafc;
+        .tbl thead th {
+            background-color: #f0f4f8;
             font-weight: bold;
             text-align: center;
+            font-size: 10.5px;
+            letter-spacing: 0.2px;
         }
-
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .font-bold { font-weight: bold; }
-
-        .note-mandat {
+        .tbl tbody tr:nth-child(even) td { background-color: #f9fafb; }
+        .tbl tfoot td {
             font-weight: bold;
-            font-size: 11px;
-            margin: 15px 0 35px 0;
+            background-color: #f0f4f8;
+        }
+        .tc  { text-align: center; }
+        .tr  { text-align: right; }
+        .tl  { text-align: left; }
+        .fw  { font-weight: bold; }
+        .fm  { font-family: 'Courier New', monospace; font-size: 10px; }
+
+        /* ─── Mandat Pembukuan ─────────────────────────────────── */
+        .mandat {
+            font-weight: bold;
+            font-size: 11.5px;
+            margin: 18px 0 28px;
+            padding: 10px 14px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            background: #fffbeb;
+            letter-spacing: 0.3px;
         }
 
-        .ttd-container {
+        /* ─── Kolom Tanda Tangan ───────────────────────────────── */
+        .ttd-row {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            gap: 20px;
+            margin-top: 22px;
         }
-
-        .ttd-box {
-            width: 45%;
+        .ttd-col {
+            width: 47%;
             text-align: center;
         }
-
+        .ttd-title {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .ttd-jabatan {
+            font-size: 9.5px;
+            color: #475569;
+            margin-bottom: 4px;
+        }
         .ttd-space {
-            height: 70px;
+            height: 68px;
+            border-bottom: 1px solid #000;
+            margin-bottom: 4px;
+        }
+        .ttd-nama {
+            font-weight: bold;
+            font-size: 11px;
+            text-decoration: underline;
+        }
+        .ttd-sub {
+            font-size: 9.5px;
+            color: #475569;
+            margin-top: 1px;
         }
 
-        .blockchain-seal {
-            margin-top: 40px;
-            padding-top: 10px;
+        /* ─── Blockchain Seal / Stempel Audit ─────────────────── */
+        .bc-seal {
+            margin-top: 36px;
+            padding-top: 9px;
             border-top: 1px dashed #94a3b8;
-            font-size: 9px;
+            font-size: 8.5px;
             color: #64748b;
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
         }
+        .bc-seal .bc-icon { margin-right: 3px; }
 
+        /* ─── Print Media Query ────────────────────────────────── */
         @media print {
             body {
-                background-color: #ffffff;
+                background: #fff;
                 padding: 0;
             }
-            .no-print {
+            .toolbar {
                 display: none !important;
             }
             .sheet-a4 {
                 box-shadow: none;
                 margin: 0;
                 width: 100%;
-                min-height: auto;
-                padding: 0;
+                min-height: unset;
+                padding: 14mm 18mm 10mm;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 0;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="no-print">
-        <a href="{{ route('admin.serah-terima.index') }}" class="btn btn-back">⬅ Kembali</a>
-        <div>
-            <strong>{{ $nomorDokumen ?? 'DOKUMEN SERAH TERIMA' }}</strong> &bull; Total: {{ $total['total_tiket'] ?? 0 }} Tiket
+    {{-- ==================== TOOLBAR (no-print) ==================== --}}
+    <div class="toolbar">
+        <div class="toolbar-info">
+            <strong>{{ $nomorDokumen ?? 'DOKUMEN SERAH TERIMA' }}</strong>
+            &bull;
+            <span>{{ $total['total_tiket'] ?? 0 }} Tiket</span>
+            &bull;
+            <span>{{ $total['total_nominal_rupiah'] ?? 'Rp 0' }}</span>
         </div>
-        <button type="button" onclick="window.print()" class="btn btn-print">🖨️ Cetak Dokumen</button>
+        <div class="toolbar-actions">
+            <a href="{{ route('admin.serah-terima.index') }}" class="btn btn-back">
+                ⬅ Kembali
+            </a>
+            <button type="button" onclick="window.print()" class="btn btn-print" id="btnCetakDokumen">
+                🖨️ Cetak Dokumen
+            </button>
+        </div>
     </div>
 
+    {{-- ==================== KERTAS A4 ==================== --}}
     <div class="sheet-a4">
-        <div class="title-header">
-            <h2>SERAH TERIMA PENYELESAIAN NASABAH</h2>
-            <h3>PER TANGGAL {{ $tanggalIndonesia ?? strtoupper(date('d F Y')) }}</h3>
+
+        {{-- Kop Dokumen --}}
+        <div class="doc-header">
+            <p class="doc-title">Serah Terima Penyelesaian Nasabah</p>
+            <p class="doc-subtitle">Per Tanggal {{ $tanggalIndonesia ?? strtoupper(now()->locale('id')->translatedFormat('d F Y')) }}</p>
+            <p class="doc-nomor">No. Dokumen: {{ $nomorDokumen ?? '—' }}</p>
         </div>
 
-        <table class="table-data">
+        {{-- Tabel Data Tiket --}}
+        <table class="tbl">
             <thead>
                 <tr>
-                    <th style="width: 5%;">No.</th>
-                    <th style="width: 25%;">Nomor Tiket</th>
-                    <th style="width: 28%;">Nama</th>
-                    <th style="width: 20%;">Nomor Rekening</th>
-                    <th style="width: 12%;">Nominal</th>
-                    <th style="width: 10%;">Keterangan</th>
+                    <th style="width:5%">No.</th>
+                    <th style="width:22%">Nomor Tiket</th>
+                    <th style="width:28%">Nama</th>
+                    <th style="width:20%">Nomor Rekening</th>
+                    <th style="width:14%">Nominal</th>
+                    <th style="width:11%">Keterangan</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($jurnals as $index => $j)
                 <tr>
-                    <td class="text-center">{{ $index + 1 }}</td>
-                    <td class="font-bold">{{ $j->no_tiket ?: '-' }}</td>
+                    <td class="tc">{{ $index + 1 }}</td>
+                    <td class="fw fm">{{ $j->no_tiket ?: '—' }}</td>
                     <td>{{ strtoupper($j->nama_nasabah) }}</td>
-                    <td class="text-center">{{ $j->no_rekening ?: '-' }}</td>
-                    <td class="text-right font-bold">{{ number_format($j->nominal_transaksi, 0, ',', '.') }}</td>
-                    <td class="text-center font-bold">CLOSED</td>
+                    <td class="tc fm">{{ $j->no_rekening ?: '—' }}</td>
+                    <td class="tr fw">Rp {{ number_format($j->nominal_transaksi, 0, ',', '.') }}</td>
+                    <td class="tc fw">CLOSED</td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center italic">Tidak ada data tiket terpilih.</td>
+                    <td colspan="6" class="tc" style="font-style:italic; padding: 12px;">
+                        Tidak ada data tiket terpilih.
+                    </td>
                 </tr>
                 @endforelse
-                @if(isset($total))
-                <tr>
-                    <td colspan="4" class="text-right font-bold">TOTAL DIBUKUKAN:</td>
-                    <td class="text-right font-bold">{{ number_format($total['total_nominal'] ?? 0, 0, ',', '.') }}</td>
-                    <td class="text-center font-bold">CLOSED</td>
-                </tr>
-                @endif
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="tr fw" style="padding-right: 8px;">TOTAL DIBUKUKAN:</td>
+                    <td class="tr fw">Rp {{ number_format($total['total_nominal'] ?? 0, 0, ',', '.') }}</td>
+                    <td class="tc fw">{{ $total['total_tiket'] ?? 0 }} Tiket</td>
+                </tr>
+            </tfoot>
         </table>
 
-        <div class="note-mandat">
-            MOHON UNTUK DIBUKUKAN HARI INI {{ $tanggalIndonesia ?? strtoupper(date('d F Y')) }}
+        {{-- Mandat Pembukuan --}}
+        <div class="mandat">
+            MOHON UNTUK DIBUKUKAN HARI INI
+            {{ $tanggalIndonesia ?? strtoupper(now()->locale('id')->translatedFormat('d F Y')) }}
         </div>
 
-        <div class="ttd-container">
-            <div class="ttd-box">
-                <div>Yang Menyerahkan,</div>
-                <div style="font-size: 10px; color: #475569; margin-top: 2px;">Staf Layanan Keluhan & Monitoring Transaksi Kartu</div>
+        {{-- Kolom Tanda Tangan --}}
+        <div class="ttd-row">
+            {{-- Kiri: Yang Menyerahkan --}}
+            <div class="ttd-col">
+                <div class="ttd-title">Yang Menyerahkan,</div>
+                <div class="ttd-jabatan">Staf Layanan Keluhan &amp; Monitoring Transaksi Kartu</div>
                 <div class="ttd-space"></div>
-                <div class="font-bold" style="text-decoration: underline;">MUJADID</div>
-                <div style="font-size: 10px;">Staf Layanan Keluhan</div>
+                @php
+                    // getAktifGrouped() mengembalikan Collection per slot, ambil elemen pertama
+                    $penyerah = isset($pejabatTtd[1]) && $pejabatTtd[1] instanceof \Illuminate\Database\Eloquent\Collection
+                        ? $pejabatTtd[1]->first()
+                        : ($pejabatTtd[1] ?? null);
+                @endphp
+                <div class="ttd-nama">
+                    {{ $penyerah?->nama ?? 'MUJADID' }}
+                </div>
+                <div class="ttd-sub">
+                    @if($penyerah?->nip) NIP. {{ $penyerah->nip }} @endif
+                    Staf Layanan Keluhan
+                </div>
             </div>
-            <div class="ttd-box">
-                <div>Yang Menerima,</div>
-                <div style="font-size: 10px; color: #475569; margin-top: 2px;">Bagian Pembukuan / Operasional PT Bank Sulteng</div>
+
+            {{-- Kanan: Yang Menerima --}}
+            <div class="ttd-col">
+                <div class="ttd-title">Yang Menerima,</div>
+                <div class="ttd-jabatan">Bagian Pembukuan / Operasional PT Bank Sulteng</div>
                 <div class="ttd-space"></div>
-                <div class="font-bold" style="text-decoration: underline;">( .................................................. )</div>
-                <div style="font-size: 10px;">Petugas Pembukuan</div>
+                <div class="ttd-nama">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                <div class="ttd-sub">Petugas Pembukuan / Operasional</div>
             </div>
         </div>
 
-        <div class="blockchain-seal">
-            🔐 Otentikasi Integritas Dokumen (Blockchain Hash): {{ $blockchainHash ?? '-' }}<br>
-            ID Dokumen: {{ $nomorDokumen ?? '-' }} &bull; Diverifikasi oleh Sistem E-Jurnal Bank Sulteng
+        {{-- Blockchain Seal / Stempel Audit Hash --}}
+        <div class="bc-seal">
+            <span class="bc-icon">🔐</span>
+            <strong>Otentikasi Integritas Dokumen (Blockchain Hash):</strong>
+            {{ $blockchainHash ?? '—' }}<br>
+            <span>ID Dokumen: {{ $nomorDokumen ?? '—' }}</span>
+            &nbsp;&bull;&nbsp;
+            <span>Diverifikasi oleh Sistem E-Jurnal Keluhan PT Bank Sulteng</span>
+            &nbsp;&bull;&nbsp;
+            <span>Dicetak: {{ now()->locale('id')->translatedFormat('d F Y, H:i') }} WITA</span>
         </div>
+
     </div>
 
 </body>
