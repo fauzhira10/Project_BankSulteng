@@ -295,24 +295,12 @@
             {{ $tanggalIndonesia ?? strtoupper(now()->locale('id')->translatedFormat('d F Y')) }}
         </div>
 
-        {{-- Kolom Tanda Tangan --}}
-        <div class="ttd-row">
-            {{-- Kiri: Yang Menyerahkan --}}
-            <div class="ttd-col">
-                <div class="ttd-title">Yang Menyerahkan,</div>
-                <div class="ttd-jabatan">Staf Layanan Keluhan & Monitoring Transaksi Kartu</div>
-                <div class="ttd-space"></div>
-                <div class="ttd-nama">MUJADID</div>
-                <div class="ttd-sub">Staf Layanan Keluhan</div>
-            </div>
-
-            {{-- Kanan: Yang Menerima --}}
-            <div class="ttd-col">
-                <div class="ttd-title">Yang Menerima,</div>
-                <div class="ttd-jabatan">Bagian Pembukuan / Operasional PT Bank Sulteng</div>
-                <div class="ttd-space"></div>
-                <div class="ttd-nama">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
-                <div class="ttd-sub">Petugas Pembukuan / Operasional</div>
+        {{-- Kolom Tanda Tangan: Hanya Yang Menerima & Titik-titik --}}
+        <div class="ttd-row" style="display: flex; justify-content: flex-end;">
+            <div class="ttd-col" style="width: 260px; text-align: center;">
+                <div class="ttd-title" style="font-weight: bold; font-size: 11px;">Yang Menerima,</div>
+                <div class="ttd-space" style="height: 65px;"></div>
+                <div class="ttd-nama" style="font-weight: bold; font-size: 11px;">( .................................................. )</div>
             </div>
         </div>
 

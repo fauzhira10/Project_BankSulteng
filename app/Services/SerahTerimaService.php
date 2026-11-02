@@ -474,36 +474,15 @@ class SerahTerimaService
         $sheet->mergeCells("A{$row}:F{$row}");
         $sheet->getStyle("A{$row}")->getFont()->setName('Arial')->setSize(11)->setBold(true)->getColor()->setRGB('0F172A');
 
-        // 6. Tanda Tangan Pejabat
+        // 6. Kolom Tanda Tangan: Hanya Yang Menerima & Titik-titik
         $row += 2;
-        $sheet->setCellValue("A{$row}", 'Yang Menyerahkan,');
-        $sheet->mergeCells("A{$row}:C{$row}");
-        $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle("A{$row}")->getFont()->setBold(true);
-
         $sheet->setCellValue("D{$row}", 'Yang Menerima,');
         $sheet->mergeCells("D{$row}:F{$row}");
         $sheet->getStyle("D{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("D{$row}")->getFont()->setBold(true);
 
-        $row++;
-        $sheet->setCellValue("A{$row}", 'Staf Layanan Keluhan & Monitoring Transaksi Kartu');
-        $sheet->mergeCells("A{$row}:C{$row}");
-        $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle("A{$row}")->getFont()->setSize(9)->getColor()->setRGB('64748B');
-
-        $sheet->setCellValue("D{$row}", 'Bagian Pembukuan / Operasional PT Bank Sulteng');
-        $sheet->mergeCells("D{$row}:F{$row}");
-        $sheet->getStyle("D{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle("D{$row}")->getFont()->setSize(9)->getColor()->setRGB('64748B');
-
         // Ruang Tanda Tangan
         $row += 4;
-        $sheet->setCellValue("A{$row}", 'MUJADID');
-        $sheet->mergeCells("A{$row}:C{$row}");
-        $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle("A{$row}")->getFont()->setBold(true)->setUnderline(true);
-
         $sheet->setCellValue("D{$row}", '( .................................................. )');
         $sheet->mergeCells("D{$row}:F{$row}");
         $sheet->getStyle("D{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);

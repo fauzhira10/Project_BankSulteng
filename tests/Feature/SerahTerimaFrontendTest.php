@@ -183,7 +183,7 @@ test('[Frontend] Halaman cetak memuat baris TOTAL DIBUKUKAN di footer tabel', fu
     $response->assertSee('3.750.000', false);
 });
 
-test('[Frontend] Halaman cetak memuat kolom tanda tangan Yang Menyerahkan dan Yang Menerima', function () {
+test('[Frontend] Halaman cetak memuat kolom tanda tangan Yang Menerima', function () {
     $admin = adminUser();
     $tiket = tiketClosed();
 
@@ -192,9 +192,8 @@ test('[Frontend] Halaman cetak memuat kolom tanda tangan Yang Menyerahkan dan Ya
         'tanggal_serah_terima' => '2026-09-18',
     ]);
 
-    $response->assertSee('Yang Menyerahkan', false);
     $response->assertSee('Yang Menerima', false);
-    $response->assertSee('Bagian Pembukuan / Operasional PT Bank Sulteng', false);
+    $response->assertDontSee('Yang Menyerahkan', false);
 });
 
 test('[Frontend] Halaman cetak memuat stempel audit blockchain di footer dokumen', function () {
