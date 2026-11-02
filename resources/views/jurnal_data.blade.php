@@ -689,14 +689,14 @@
             </div>
         @else
             <!-- Empty State -->
-            <div class="empty-state" id="emptyState">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <div class="empty-state" id="emptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px 20px; width: 100%;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 64px; color: #94a3b8; margin: 0 auto 16px auto; display: block;">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
                     <line x1="9" y1="15" x2="15" y2="15"></line>
                 </svg>
-                <h3>Tidak Ada Data Jurnal Keluhan</h3>
-                <p>Tidak ditemukan data keluhan yang sesuai dengan kata kunci atau filter yang Anda pilih.</p>
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: #1e293b; margin-bottom: 6px; text-align: center;">Tidak Ada Data Jurnal Keluhan</h3>
+                <p style="font-size: 0.84375rem; color: #64748b; max-width: 440px; margin: 0 auto 16px auto; line-height: 1.5; text-align: center;">Tidak ditemukan data keluhan yang sesuai dengan kata kunci atau filter yang Anda pilih.</p>
                 <div style="display: flex; justify-content: center; gap: 10px;">
                     <a href="{{ route('jurnal.index') }}" class="btn btn-secondary btn-sm">Reset Pencarian</a>
                 </div>

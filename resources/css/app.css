@@ -874,16 +874,19 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 50px 20px;
+    padding: 60px 20px;
     color: #64748b;
+    width: 100%;
 }
 
 .empty-state svg {
     width: 64px;
     height: 64px;
     color: #94a3b8;
-    margin-bottom: 16px;
+    margin: 0 auto 16px auto;
+    display: block;
 }
 
 .empty-state h3 {
@@ -891,12 +894,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     font-weight: 700;
     color: #1e293b;
     margin-bottom: 6px;
+    text-align: center;
 }
 
 .empty-state p {
     font-size: 0.84375rem;
     max-width: 400px;
     margin: 0 auto 16px;
+    text-align: center;
 }
 
 /* Pagination & Toolbar */
