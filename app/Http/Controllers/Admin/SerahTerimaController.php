@@ -23,15 +23,17 @@ class SerahTerimaController extends Controller
         // Ambil data untuk tabel pemilihan tiket
         $tikets = $query->paginate(50)->withQueryString();
 
-        // Ringkasan global tiket yang sudah selesai
+        // Ringkasan global & analitik tiket yang sudah selesai
         $semuaSelesai = SerahTerimaService::ambilTiketSelesai()->get();
         $ringkasan = SerahTerimaService::kalkulasiTotal($semuaSelesai);
+        $analitik = SerahTerimaService::kalkulasiAnalitik($semuaSelesai);
 
         $cabangs = MasterCabang::orderBy('nama_cabang')->get();
 
         return view('admin.serah_terima.index', [
             'tikets' => $tikets,
             'ringkasan' => $ringkasan,
+            'analitik' => $analitik,
             'cabangs' => $cabangs,
             'filters' => $request->only(['q', 'tgl_selesai', 'master_cabang_id']),
         ]);
@@ -103,6 +105,48 @@ class SerahTerimaController extends Controller
             'nomorDokumen' => $nomorDokumen,
             'blockchainHash' => $blockchainHash,
             'pejabatTtd' => $pejabatTtd,
+        ]);
+    }
+
+    /**
+     * Mengekspor data tiket terpilih ke dalam berkas CSV Pembukuan resmi Bank Sulteng.
+     */
+    public function exportCsv(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer',
+            'tanggal_serah_terima' => 'nullable|date',
+        ], [
+            'ids.required' => 'Pilih minimal satu tiket pengaduan untuk diekspor ke CSV.',
+            'ids.min' => 'Pilih minimal satu tiket pengaduan untuk diekspor ke CSV.',
+        ]);
+
+        $ids = array_values(array_map('intval', $request->input('ids', [])));
+
+        $jurnals = Jurnal::with(['masterCabang', 'masterTransaksi', 'pengaduan'])
+            ->whereIn('id', $ids)
+            ->orderBy('tgl_selesai')
+            ->orderBy('id')
+            ->get();
+
+        if ($jurnals->isEmpty()) {
+            return redirect()
+                ->route('admin.serah-terima.index')
+                ->with('error', 'Tiket yang dipilih tidak ditemukan atau belum selesai.');
+        }
+
+        $tanggalInput = $request->filled('tanggal_serah_terima')
+            ? Carbon::parse($request->input('tanggal_serah_terima'))
+            : now();
+
+        $csvContent = SerahTerimaService::generateCsvPembukuan($jurnals, $tanggalInput);
+        $filename = 'Serah_Terima_Pembukuan_' . $tanggalInput->format('Ymd_His') . '.csv';
+
+        return response($csvContent, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate',
         ]);
     }
 }

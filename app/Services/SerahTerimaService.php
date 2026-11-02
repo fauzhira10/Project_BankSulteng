@@ -169,4 +169,181 @@ class SerahTerimaService
             'created_by' => $user?->id ?? auth()->id(),
         ]);
     }
+
+    /**
+     * Mengkategorikan channel transaksi jurnal ke dalam 4 kelompok utama analitik:
+     * ATM Tunai, Mobile Banking, EDC, atau QRIS.
+     */
+    public static function kategorikanChannel(mixed $jurnal): string
+    {
+        $rawChannel = '';
+        $rawJenis = '';
+
+        if (is_object($jurnal)) {
+            $rawChannel = strtoupper(trim((string) (
+                $jurnal->channel
+                ?? $jurnal->masterTransaksi?->channel
+                ?? $jurnal->pengaduan?->channel
+                ?? ''
+            )));
+            $rawJenis = strtoupper(trim((string) (
+                $jurnal->jenis_transaksi
+                ?? $jurnal->masterTransaksi?->jenis_transaksi
+                ?? $jurnal->pengaduan?->transaksi?->jenis_transaksi
+                ?? ''
+            )));
+        } elseif (is_array($jurnal)) {
+            $rawChannel = strtoupper(trim((string) ($jurnal['channel'] ?? $jurnal['master_transaksi']['channel'] ?? '')));
+            $rawJenis = strtoupper(trim((string) ($jurnal['jenis_transaksi'] ?? $jurnal['master_transaksi']['jenis_transaksi'] ?? '')));
+        }
+
+        $gabungan = $rawChannel . ' ' . $rawJenis;
+
+        if (str_contains($gabungan, 'QRIS')) {
+            return 'QRIS';
+        }
+
+        if (
+            str_contains($gabungan, 'MOBILE')
+            || str_contains($gabungan, 'MBANKING')
+            || str_contains($gabungan, 'M-BANKING')
+            || str_contains($gabungan, 'SMS BANKING')
+        ) {
+            return 'Mobile Banking';
+        }
+
+        if (str_contains($gabungan, 'EDC') || str_contains($gabungan, 'DEBIT')) {
+            return 'EDC';
+        }
+
+        return 'ATM Tunai';
+    }
+
+    /**
+     * Menghitung rekap analitik komprehensif untuk tiket selesai:
+     * 1. Volume & Nilai Pembukuan
+     * 2. Kepatuhan SLA (Tepat Waktu vs Overdue)
+     * 3. Distribusi Channel Transaksi (ATM Tunai, Mobile Banking, EDC, QRIS)
+     *
+     * @param iterable|Collection|array $jurnals
+     * @return array<string, mixed>
+     */
+    public static function kalkulasiAnalitik($jurnals): array
+    {
+        $volume = self::kalkulasiTotal($jurnals);
+        $totalTiket = $volume['total_tiket'];
+        $totalNominal = $volume['total_nominal'];
+
+        $tepatWaktu = 0;
+        $terlambat = 0;
+        $totalDurasiHari = 0;
+
+        $channels = [
+            'ATM Tunai' => ['jumlah_tiket' => 0, 'nominal' => 0.0, 'nominal_rupiah' => 'Rp 0', 'persentase' => 0.0],
+            'Mobile Banking' => ['jumlah_tiket' => 0, 'nominal' => 0.0, 'nominal_rupiah' => 'Rp 0', 'persentase' => 0.0],
+            'EDC' => ['jumlah_tiket' => 0, 'nominal' => 0.0, 'nominal_rupiah' => 'Rp 0', 'persentase' => 0.0],
+            'QRIS' => ['jumlah_tiket' => 0, 'nominal' => 0.0, 'nominal_rupiah' => 'Rp 0', 'persentase' => 0.0],
+        ];
+
+        foreach ($jurnals as $jurnal) {
+            $nominal = (float) (is_object($jurnal) ? ($jurnal->nominal_transaksi ?? 0) : ($jurnal['nominal_transaksi'] ?? 0));
+
+            // 1. Evaluasi Kepatuhan SLA
+            $tglTerima = is_object($jurnal) ? ($jurnal->tgl_terima ?? null) : ($jurnal['tgl_terima'] ?? null);
+            $tglSelesai = is_object($jurnal) ? ($jurnal->tgl_selesai ?? null) : ($jurnal['tgl_selesai'] ?? null);
+            $batasSla = 14;
+
+            if (is_object($jurnal) && isset($jurnal->pengaduan) && $jurnal->pengaduan?->sla_hari) {
+                $batasSla = (int) $jurnal->pengaduan->sla_hari;
+            } elseif (is_array($jurnal) && isset($jurnal['sla_hari'])) {
+                $batasSla = (int) $jurnal['sla_hari'];
+            }
+
+            $isOverdue = false;
+            if ($tglTerima && $tglSelesai) {
+                $durasi = abs(Carbon::parse($tglTerima)->startOfDay()->diffInDays(Carbon::parse($tglSelesai)->startOfDay()));
+                $totalDurasiHari += $durasi;
+                $isOverdue = $durasi > $batasSla;
+            } elseif ($tglSelesai && is_object($jurnal) && $jurnal->pengaduan?->tgl_jatuh_tempo) {
+                $isOverdue = Carbon::parse($tglSelesai)->startOfDay()->gt(
+                    Carbon::parse($jurnal->pengaduan->tgl_jatuh_tempo)->startOfDay()
+                );
+            }
+
+            if ($isOverdue) {
+                $terlambat++;
+            } else {
+                $tepatWaktu++;
+            }
+
+            // 2. Evaluasi Distribusi Channel
+            $kategoriChannel = self::kategorikanChannel($jurnal);
+            $channels[$kategoriChannel]['jumlah_tiket']++;
+            $channels[$kategoriChannel]['nominal'] += $nominal;
+        }
+
+        foreach ($channels as $nama => &$info) {
+            $info['nominal_rupiah'] = 'Rp ' . number_format($info['nominal'], 0, ',', '.');
+            $info['persentase'] = $totalNominal > 0
+                ? round(($info['nominal'] / $totalNominal) * 100, 1)
+                : 0.0;
+        }
+        unset($info);
+
+        $persenTepatWaktu = $totalTiket > 0 ? round(($tepatWaktu / $totalTiket) * 100, 1) : 0.0;
+        $persenTerlambat = $totalTiket > 0 ? round(($terlambat / $totalTiket) * 100, 1) : 0.0;
+        $rataRataHari = $totalTiket > 0 ? round($totalDurasiHari / $totalTiket, 1) : 0.0;
+
+        return [
+            'volume' => $volume,
+            'sla' => [
+                'total_tiket' => $totalTiket,
+                'tepat_waktu' => $tepatWaktu,
+                'terlambat' => $terlambat,
+                'overdue' => $terlambat,
+                'persentase_tepat_waktu' => $persenTepatWaktu,
+                'persentase_terlambat' => $persenTerlambat,
+                'persentase_overdue' => $persenTerlambat,
+                'rata_rata_hari' => $rataRataHari,
+            ],
+            'channels' => $channels,
+        ];
+    }
+
+    /**
+     * Menghasilkan konten CSV Pembukuan sesuai format standar operasional Bank Sulteng.
+     *
+     * @param iterable|Collection|array $jurnals
+     */
+    public static function generateCsvPembukuan($jurnals, ?Carbon $tanggal = null): string
+    {
+        $tgl = $tanggal ? $tanggal->copy() : now();
+        $tanggalIndonesia = strtoupper($tgl->locale('id')->translatedFormat('d F Y'));
+
+        $lines = [];
+        $lines[] = 'SERAH TERIMA PENYELESAIAN NASABAH,,,';
+        $lines[] = "PER TANGGAL {$tanggalIndonesia},,,";
+        $lines[] = 'No.,Nomor Tiket,Nama,Nomor Rekening,Nominal,Keterangan';
+
+        $no = 1;
+        foreach ($jurnals as $jurnal) {
+            $noTiket = is_object($jurnal) ? ($jurnal->no_tiket ?? '') : ($jurnal['no_tiket'] ?? '');
+            $nama = is_object($jurnal) ? ($jurnal->nama_nasabah ?? '') : ($jurnal['nama_nasabah'] ?? '');
+            $noRekening = is_object($jurnal) ? ($jurnal->no_rekening ?? '') : ($jurnal['no_rekening'] ?? '');
+            $nominal = is_object($jurnal) ? ($jurnal->nominal_transaksi ?? 0) : ($jurnal['nominal_transaksi'] ?? 0);
+
+            $noTiketClean = str_replace([',', "\r", "\n"], ' ', trim((string) $noTiket));
+            $namaClean = strtoupper(str_replace([',', "\r", "\n"], ' ', trim((string) $nama)));
+            $noRekeningClean = str_replace([',', "\r", "\n"], ' ', trim((string) $noRekening));
+            $nominalInt = (int) round((float) $nominal);
+
+            $lines[] = "{$no},{$noTiketClean},{$namaClean},{$noRekeningClean},{$nominalInt},CLOSED";
+            $no++;
+        }
+
+        $lines[] = "MOHON UNTUK DIBUKUKAN HARI INI {$tanggalIndonesia},,,,,,";
+        $lines[] = ',,,,"Yang Menerima,",,,,';
+
+        return implode("\n", $lines) . "\n";
+    }
 }

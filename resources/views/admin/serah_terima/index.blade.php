@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Serah Terima Penyelesaian Nasabah')
 @section('page_title', 'Serah Terima Penyelesaian Pengaduan Nasabah')
@@ -140,24 +140,85 @@
 @section('content')
 <div class="max-w-[78.125rem] mx-auto space-y-5">
 
-    {{-- === RINGKASAN GLOBAL === --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    {{-- === WIDGET REKAP ANALITIK (3 KARTU METRIK) === --}}
+    @php
+        $slaData = $analitik['sla'] ?? [
+            'tepat_waktu' => 0,
+            'terlambat' => 0,
+            'persentase_tepat_waktu' => 0,
+            'persentase_terlambat' => 0,
+            'rata_rata_hari' => 0,
+        ];
+        $channelData = $analitik['channels'] ?? [
+            'ATM Tunai' => ['jumlah_tiket' => 0, 'nominal_rupiah' => 'Rp 0', 'persentase' => 0],
+            'Mobile Banking' => ['jumlah_tiket' => 0, 'nominal_rupiah' => 'Rp 0', 'persentase' => 0],
+            'EDC' => ['jumlah_tiket' => 0, 'nominal_rupiah' => 'Rp 0', 'persentase' => 0],
+            'QRIS' => ['jumlah_tiket' => 0, 'nominal_rupiah' => 'Rp 0', 'persentase' => 0],
+        ];
+    @endphp
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {{-- Kartu 1: Volume & Nilai Pembukuan --}}
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <div class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-wider">Volume &amp; Nilai Pembukuan</div>
+                    <div class="text-2xl font-extrabold text-navy mt-1">{{ number_format($ringkasan['total_tiket'] ?? 0, 0, ',', '.') }} Tiket Selesai</div>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
             </div>
-            <div>
-                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Tiket Selesai</div>
-                <div class="text-2xl font-extrabold text-navy mt-0.5">{{ number_format($ringkasan['total_tiket'] ?? 0, 0, ',', '.') }} Tiket</div>
+            <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-baseline justify-between gap-2">
+                <span class="text-xs font-semibold text-slate-500">Total Siap Dibukukan:</span>
+                <span class="text-lg font-extrabold text-emerald-600">{{ $ringkasan['total_nominal_rupiah'] ?? 'Rp 0' }}</span>
             </div>
         </div>
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 text-brand-blue flex items-center justify-center shrink-0">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+
+        {{-- Kartu 2: Kepatuhan SLA / Resolution Performance --}}
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <div class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-wider">Kepatuhan SLA (Resolution Performance)</div>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <span class="text-2xl font-extrabold text-emerald-600">{{ $slaData['persentase_tepat_waktu'] }}%</span>
+                        <span class="text-xs font-semibold text-slate-500">Memenuhi SLA ({{ $slaData['tepat_waktu'] }} tiket)</span>
+                    </div>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-blue-50 text-brand-blue flex items-center justify-center shrink-0">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
             </div>
-            <div>
-                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Akumulasi Nominal</div>
-                <div class="text-2xl font-extrabold text-emerald-600 mt-0.5">{{ $ringkasan['total_nominal_rupiah'] ?? 'Rp 0' }}</div>
+            <div class="mt-3">
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden flex">
+                    <div class="bg-emerald-500 h-full transition-all" style="width: {{ $slaData['persentase_tepat_waktu'] }}%"></div>
+                    <div class="bg-rose-500 h-full transition-all" style="width: {{ $slaData['persentase_terlambat'] }}%"></div>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between text-[0.72rem] font-semibold">
+                    <span class="text-emerald-700">✓ Tepat Waktu: {{ $slaData['tepat_waktu'] }} ({{ $slaData['persentase_tepat_waktu'] }}%)</span>
+                    <span class="text-rose-600">⚠ Overdue: {{ $slaData['terlambat'] }} ({{ $slaData['persentase_terlambat'] }}%)</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Kartu 3: Distribusi Channel Transaksi --}}
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex items-center justify-between gap-2 mb-2.5">
+                <div class="text-[0.7rem] font-bold text-slate-500 uppercase tracking-wider">Distribusi Channel Transaksi</div>
+                <span class="text-[0.68rem] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Porsi Klaim</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                @foreach(['ATM Tunai', 'Mobile Banking', 'EDC', 'QRIS'] as $chName)
+                @php
+                    $chInfo = $channelData[$chName] ?? ['jumlah_tiket' => 0, 'nominal_rupiah' => 'Rp 0', 'persentase' => 0];
+                @endphp
+                <div class="p-2 rounded-xl bg-slate-50 border border-slate-100 flex flex-col">
+                    <div class="flex items-center justify-between gap-1">
+                        <span class="font-bold text-slate-700 text-[0.7rem] truncate">{{ $chName }}</span>
+                        <span class="font-extrabold text-brand-blue text-[0.68rem]">{{ $chInfo['persentase'] }}%</span>
+                    </div>
+                    <div class="font-bold text-navy text-[0.72rem] mt-0.5 truncate">{{ $chInfo['nominal_rupiah'] }}</div>
+                </div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -181,12 +242,22 @@
                             <input type="text" id="inputSearch" placeholder="Cari nama / tiket / rekening…" class="filter-inp pl-8 w-56" autocomplete="off">
                         </div>
                     </div>
-                    <button type="submit" id="btnCetakHeader"
-                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-navy to-brand-blue text-white font-bold text-xs shadow-md hover:opacity-95 hover:scale-[1.02] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                            disabled>
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                        🖨️ Cetak Lembar Serah Terima
-                    </button>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <button type="submit" id="btnExportCsvHeader"
+                                formaction="{{ route('admin.serah-terima.export_csv') }}"
+                                formtarget="_self"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs shadow-md hover:opacity-95 hover:scale-[1.02] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                disabled>
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            📥 Ekspor CSV Pembukuan
+                        </button>
+                        <button type="submit" id="btnCetakHeader"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-navy to-brand-blue text-white font-bold text-xs shadow-md hover:opacity-95 hover:scale-[1.02] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                disabled>
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                            🖨️ Cetak Lembar Serah Terima
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -294,6 +365,7 @@
     const badgeCount = document.getElementById('fsBadgeCount');
     const badgeTotal = document.getElementById('fsBadgeTotal');
     const btnHdr     = document.getElementById('btnCetakHeader');
+    const btnCsvHdr  = document.getElementById('btnExportCsvHeader');
     const srch       = document.getElementById('inputSearch');
 
     function cbs()      { return Array.from(tbody.querySelectorAll('.cb-tiket')); }
@@ -312,6 +384,7 @@
         badgeTotal.textContent = rupiah(total);
         floatBar.classList.toggle('visible', count > 0);
         if (btnHdr) btnHdr.disabled = count === 0;
+        if (btnCsvHdr) btnCsvHdr.disabled = count === 0;
 
         const allChk = shown.length > 0 && shown.every(c => c.checked);
         btnAll.classList.toggle('all-checked', allChk);

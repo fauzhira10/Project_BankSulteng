@@ -136,6 +136,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('serah-terima')->name('admin.serah-terima.')->group(function () {
         Route::get('/', [SerahTerimaController::class, 'index'])->name('index');
         Route::post('/cetak', [SerahTerimaController::class, 'cetak'])->name('cetak');
+        Route::post('/export-csv', [SerahTerimaController::class, 'exportCsv'])->name('export_csv');
     });
 
     // ---------- Blockchain Jejak Audit (Block Explorer) ----------
