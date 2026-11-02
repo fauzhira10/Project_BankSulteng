@@ -314,7 +314,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     border: 1px solid #fca5a5;
 }
 
-.badge-strip, .badge-neutral {
+.badge-strip,
+.badge-neutral {
     background-color: #f1f5f9;
     color: #64748b;
     border: 1px solid #cbd5e1;
@@ -637,11 +638,30 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     margin-top: 2px;
 }
 
-.stat-total .stat-icon { background-color: var(--color-brand-blue-light); color: var(--color-brand-blue); }
-.stat-menunggu .stat-icon { background-color: #fef3c7; color: #d97706; }
-.stat-success .stat-icon { background-color: #e0f2fe; color: #0284c7; }
-.stat-done .stat-icon { background-color: #d1fae5; color: #10b981; }
-.stat-rejected .stat-icon { background-color: #fee2e2; color: #ef4444; }
+.stat-total .stat-icon {
+    background-color: var(--color-brand-blue-light);
+    color: var(--color-brand-blue);
+}
+
+.stat-menunggu .stat-icon {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.stat-success .stat-icon {
+    background-color: #e0f2fe;
+    color: #0284c7;
+}
+
+.stat-done .stat-icon {
+    background-color: #d1fae5;
+    color: #10b981;
+}
+
+.stat-rejected .stat-icon {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
 
 /* Filter Grid */
 .filter-grid {
@@ -715,7 +735,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     transition: all 0.2s ease;
 }
 
-.upload-dropzone:hover, .upload-dropzone.dragover {
+.upload-dropzone:hover,
+.upload-dropzone.dragover {
     border-color: #0284c7;
     background-color: #e0f2fe;
 }
@@ -819,9 +840,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     text-align: center;
 }
 
-.stat-result-card.card-total { border-top: 3px solid #0284c7; }
-.stat-result-card.card-new { border-top: 3px solid #059669; background-color: #f0fdf4; }
-.stat-result-card.card-sync { border-top: 3px solid #d97706; }
+.stat-result-card.card-total {
+    border-top: 3px solid #0284c7;
+}
+
+.stat-result-card.card-new {
+    border-top: 3px solid #059669;
+    background-color: #f0fdf4;
+}
+
+.stat-result-card.card-sync {
+    border-top: 3px solid #d97706;
+}
 
 .stat-result-val {
     font-size: 1.25rem;
@@ -841,6 +871,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 /* Empty State */
 .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
     padding: 50px 20px;
     color: #64748b;
@@ -1100,6 +1133,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     .filter-grid {
         grid-template-columns: 1fr 1fr;
     }
+
     .detail-grid {
         grid-template-columns: 1fr;
     }
@@ -1112,6 +1146,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 @layer utilities {
+
     /* Subtle background grid pattern for login and special pages */
     .bg-pattern-dots {
         background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
@@ -1124,6 +1159,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
             opacity: 0;
             transform: scale(0.96) translateY(8px);
         }
+
         to {
             opacity: 1;
             transform: scale(1) translateY(0);
@@ -1136,8 +1172,17 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
     /* Soft pulse dot animation */
     @keyframes pulseSoft {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.3; transform: scale(0.7); }
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.3;
+            transform: scale(0.7);
+        }
     }
 
     .animate-pulse-soft {
@@ -1153,7 +1198,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
        Jangan tambahkan lagi padding samping atau border di sini.
        Catatan: berkas cetak A4 di resources/views/cetak/ punya .highlight-yellow
        sendiri yang memang memakai bantalan — itu dipakai pada nilai utuh, biarkan. */
-    mark.highlight-yellow, .highlight-yellow {
+    mark.highlight-yellow,
+    .highlight-yellow {
         background-color: #fef08a !important;
         color: #854d0e !important;
         font-weight: 700 !important;
@@ -1163,5 +1209,3 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         display: inline;
     }
 }
-
-
