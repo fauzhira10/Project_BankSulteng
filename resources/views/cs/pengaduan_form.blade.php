@@ -37,6 +37,24 @@
                 Anda mengubah pengaduan <strong class="font-mono">{{ $pengaduan->nomor_tiket }}</strong>. Perubahan hanya dapat dilakukan selama status masih <strong>Menunggu Verifikasi Pusat</strong>. Lampiran baru akan <strong>ditambahkan</strong>; lampiran lama bisa dihapus lewat tombol di sampingnya.
             </div>
         </div>
+    @else
+        {{-- Banner pemberitahuan jika draf isian sebelumnya dipulihkan otomatis --}}
+        <div id="bannerDraftRestored" style="display: none;" class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-3.5 mb-5 text-[0.8125rem] flex items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-2.5">
+                <span class="text-lg leading-none">💾</span>
+                <div>
+                    <span class="font-bold text-sky-950">Draf Isian Dipulihkan:</span>
+                    <span class="text-sky-800">Formulir otomatis terisi kembali dari ketikan Anda sebelumnya yang belum sempat dikirim.</span>
+                </div>
+            </div>
+            <button type="button" id="btnHapusDraft" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-600 hover:text-white bg-white hover:bg-rose-600 border border-rose-200 hover:border-rose-600 rounded-lg shadow-2xs transition-colors cursor-pointer shrink-0" title="Kosongkan formulir dan hapus draf yang tersimpan">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Buang Draf</span>
+            </button>
+        </div>
     @endif
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs mb-6 overflow-hidden">
@@ -485,6 +503,149 @@
         });
     }
 
+    // ---------- Auto-Save & Pulihkan Draf Formulir (LocalStorage) ----------
+    const isEditMode = {{ $edit ? 'true' : 'false' }};
+    const hasServerErrors = {{ $errors->any() ? 'true' : 'false' }};
+    const DRAFT_KEY = 'cs_pengaduan_draft_{{ auth()->id() ?? 'guest' }}';
+    const bannerDraftRestored = document.getElementById('bannerDraftRestored');
+    const btnHapusDraft = document.getElementById('btnHapusDraft');
+
+    const draftFields = [
+        'nama_pelapor', 'master_cabang_id', 'kategori', 'prioritas',
+        'sub_kategori', 'sub_kategori_2', 'nama_nasabah', 'no_hp',
+        'no_ktp', 'no_rekening', 'no_kartu', 'master_transaksi_id',
+        'channel', 'no_resi', 'terminal_transaksi', 'tgl_transaksi', 'kronologi'
+    ];
+
+    let draftSaveTimer = null;
+    function simpanDraftKeStorage() {
+        if (isEditMode || !formEl) return;
+        const draft = {};
+
+        draftFields.forEach(name => {
+            const el = formEl.elements[name];
+            if (el) draft[name] = el.value;
+        });
+
+        if (nominalDisplay) {
+            draft['nominal_display'] = nominalDisplay.value;
+        }
+
+        const adaDataUser = [
+            draft.kategori,
+            draft.sub_kategori,
+            draft.sub_kategori_2,
+            draft.nama_nasabah,
+            draft.no_hp,
+            draft.no_ktp,
+            draft.no_rekening,
+            draft.no_kartu,
+            draft.master_transaksi_id,
+            draft.no_resi,
+            draft.nominal_display,
+            draft.tgl_transaksi,
+            draft.kronologi
+        ].some(v => typeof v === 'string' && v.trim() !== '');
+
+        if (adaDataUser) {
+            try {
+                localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+            } catch (e) {
+                console.warn('Gagal menyimpan draf ke localStorage:', e);
+            }
+        } else {
+            localStorage.removeItem(DRAFT_KEY);
+        }
+    }
+
+    function pulihkanDraftDariStorage() {
+        if (isEditMode || hasServerErrors || !formEl) return;
+        let rawDraft = null;
+        try {
+            rawDraft = localStorage.getItem(DRAFT_KEY);
+        } catch (e) {
+            console.warn('Gagal membaca draf dari localStorage:', e);
+        }
+        if (!rawDraft) return;
+
+        let draft = null;
+        try {
+            draft = JSON.parse(rawDraft);
+        } catch (e) {
+            console.error('Format draf tidak valid:', e);
+            return;
+        }
+
+        if (!draft || typeof draft !== 'object') return;
+
+        let dipulihkan = false;
+
+        draftFields.forEach(name => {
+            if (draft[name] !== undefined && draft[name] !== null && draft[name] !== '') {
+                const el = formEl.elements[name];
+                if (el) {
+                    el.value = draft[name];
+                    dipulihkan = true;
+                }
+            }
+        });
+
+        if (draft.nominal_display && nominalDisplay) {
+            nominalDisplay.value = draft.nominal_display;
+            syncNominal();
+            dipulihkan = true;
+        }
+
+        // Sesuaikan pilihan dropdown ATM / terminal transaksi
+        populateAtmDropdown(draft.terminal_transaksi || initialTerminal);
+
+        // Perbarui teks keterangan SLA & hitungan kronologi
+        hitungKronologi();
+        updateSlaHelp();
+
+        // Picu pemeriksaan duplikat jika nomor resi terisi
+        if (draft.no_resi) {
+            const resiEl = document.getElementById('no_resi');
+            if (resiEl) resiEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        // Tampilkan banner bahwa draf telah dipulihkan otomatis
+        if (dipulihkan && bannerDraftRestored) {
+            bannerDraftRestored.style.display = 'flex';
+        }
+    }
+
+    if (!isEditMode && formEl) {
+        // Simpan draf otomatis dengan debounce 300ms saat user mengetik atau memilih opsi
+        formEl.addEventListener('input', () => {
+            clearTimeout(draftSaveTimer);
+            draftSaveTimer = setTimeout(simpanDraftKeStorage, 300);
+        });
+        formEl.addEventListener('change', () => {
+            clearTimeout(draftSaveTimer);
+            draftSaveTimer = setTimeout(simpanDraftKeStorage, 300);
+        });
+
+        // Hapus draf ketika form dikirim (submit)
+        formEl.addEventListener('submit', () => {
+            try {
+                localStorage.removeItem(DRAFT_KEY);
+            } catch (e) {}
+        });
+
+        // Tombol Buang Draf
+        if (btnHapusDraft) {
+            btnHapusDraft.addEventListener('click', () => {
+                if (confirm('Buang draf pengisian formulir ini? Semua isian akan dikosongkan kembali.')) {
+                    try {
+                        localStorage.removeItem(DRAFT_KEY);
+                    } catch (e) {}
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
     if (transaksiEl) transaksiEl.addEventListener('change', function () { loadDetailTransaksi(this.value); });
     if (cabangSelect) cabangSelect.addEventListener('change', () => populateAtmDropdown(terminalSelect ? terminalSelect.value : ''));
 
@@ -492,6 +653,7 @@
         populateAtmDropdown(initialTerminal);
         hitungKronologi();
         if (transaksiEl && transaksiEl.value && channelSelect && !channelSelect.value) loadDetailTransaksi(transaksiEl.value);
+        pulihkanDraftDariStorage();
     });
 </script>
 @endpush
