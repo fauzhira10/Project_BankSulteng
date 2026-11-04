@@ -17,7 +17,7 @@
         <p class="text-xs sm:text-sm text-white/85 m-0">Rekapitulasi statistik penyelesaian pengaduan keluhan nasabah per bulan & tahunan PT Bank Sulteng.</p>
     </div>
     <div class="flex items-center gap-2.5 flex-wrap">
-        <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-amber-200">
+        <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white">
             Tahun Periode: {{ $selectedYear }}
         </span>
         <a href="{{ route('laporan.export_excel', ['tahun' => $selectedYear, 'master_cabang_id' => $selectedCabang, 'status' => $selectedStatus]) }}" 
@@ -119,7 +119,7 @@
                         <option value="">-- Semua Status Keluhan --</option>
                         <option value="Done" {{ $selectedStatus === 'Done' ? 'selected' : '' }}>Done (Selesai)</option>
                         <option value="Success" {{ $selectedStatus === 'Success' ? 'selected' : '' }}>Success (Berhasil)</option>
-                        <option value="Menunggu" {{ $selectedStatus === 'Menunggu' ? 'selected' : '' }}>Menunggu (Dalam Proses)</option>
+                        <option value="Pending" {{ in_array($selectedStatus, ['Pending', 'Menunggu']) ? 'selected' : '' }}>Pending (Dalam Proses)</option>
                         <option value="Rejected" {{ $selectedStatus === 'Rejected' ? 'selected' : '' }}>Rejected (Ditolak)</option>
                         <option value="-" {{ $selectedStatus === '-' ? 'selected' : '' }}>- (Belum Ditentukan)</option>
                     </select>
@@ -133,7 +133,7 @@
 
             <!-- Tombol Aksi -->
             <div class="flex items-center gap-2.5 h-[2.625rem]">
-                <button type="submit" class="h-[2.625rem] px-5 rounded-xl bg-gradient-to-r from-navy to-blue-700 hover:from-navy-dark hover:to-blue-800 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm shadow-navy/20 transition-all cursor-pointer">
+                <button type="submit" class="h-[2.625rem] px-5 rounded-xl bg-brand-blue hover:bg-blue-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -222,7 +222,7 @@
             $endDate = sprintf('%04d-%02d-%02d', $selectedYear, $selectedMonth, $lastDay);
         @endphp
         <a href="{{ route('jurnal.index', ['tgl_dari' => $startDate, 'tgl_sampai' => $endDate, 'master_cabang_id' => $selectedCabang, 'status' => $selectedStatus]) }}" 
-           class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 shadow-xs transition-all whitespace-nowrap">
+           class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-brand-blue hover:bg-blue-700 text-white shadow-xs transition-colors whitespace-nowrap">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>

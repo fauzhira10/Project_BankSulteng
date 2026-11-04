@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Seluruh pengaduan dari ' . ($user->cabang->nama_cabang ?? 'cabang Anda') . ' beserta status penanganannya di pusat')
 
 @section('topbar_action')
-    <a href="{{ route('cs.pengaduan.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 text-xs font-semibold shadow-sm transition-opacity">
+    <a href="{{ route('cs.pengaduan.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg bg-brand-blue hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -36,7 +36,7 @@
                 </select>
             </div>
             <div class="flex gap-2">
-                <button type="submit" class="h-10 px-4 rounded-xl bg-navy text-white text-xs font-bold hover:opacity-90 transition-opacity cursor-pointer">Terapkan</button>
+                <button type="submit" class="h-10 px-4 rounded-xl bg-brand-blue hover:bg-[#0052a3] text-white text-xs font-bold transition-colors cursor-pointer">Terapkan</button>
                 <a href="{{ route('cs.pengaduan.index') }}" class="h-10 px-4 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold hover:bg-slate-100 inline-flex items-center">Reset</a>
             </div>
         </form>
@@ -113,7 +113,7 @@
                                     <td style="text-align:center; white-space:nowrap;">
                                         <a href="{{ route('cs.pengaduan.show', $p) }}" class="btn btn-secondary btn-sm" style="padding: 5px 11px; font-size: 0.75rem;">Detail</a>
                                         @if($p->bisaDiedit())
-                                            <a href="{{ route('cs.pengaduan.edit', $p) }}" class="btn btn-sm" style="padding: 5px 11px; font-size: 0.75rem; background:#fef3c7; color:#b45309; border:1px solid #fde68a; margin-left:4px;">Edit</a>
+                                            <a href="{{ route('cs.pengaduan.edit', $p) }}" class="btn btn-sm" style="padding: 5px 11px; font-size: 0.75rem; background-color: #0066CC; color: #ffffff; border: 1px solid #0052a3; font-weight: 600; margin-left: 4px;">Edit</a>
                                         @endif
                                     </td>
                                 </tr>

@@ -11,6 +11,28 @@
 @endphp
 <div class="max-w-[80rem] mx-auto flex flex-col gap-5">
 
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-navy-dark via-blue-900 to-sky-700 rounded-2xl p-6 text-white shadow-md flex justify-between items-center flex-wrap gap-4">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5 m-0 mb-1.5">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="7" width="6" height="10" rx="1.5"></rect>
+                    <rect x="16" y="7" width="6" height="10" rx="1.5"></rect>
+                    <rect x="9" y="7" width="6" height="10" rx="1.5"></rect>
+                    <line x1="8" y1="12" x2="9" y2="12"></line>
+                    <line x1="15" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <span>Blockchain Jejak Audit &amp; Explorer</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-white/85 m-0">Setiap catatan log audit disegel ke dalam blok berantai dan diverifikasi integritasnya secara terdistribusi ke Ethereum.</p>
+        </div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white">
+                Total Blok: {{ number_format($pemeriksaan['jumlah_blok'], 0, ',', '.') }}
+            </span>
+        </div>
+    </div>
+
     {{-- Status & Aksi --}}
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 flex flex-col lg:flex-row lg:items-center gap-4">
         <div class="flex items-center gap-4 grow">
@@ -23,11 +45,11 @@
                     <div class="text-[0.8125rem] text-slate-500">Tekan <strong>Tambang Blok</strong> untuk membuat blok genesis dan menyegel {{ number_format($pemeriksaan['transaksi_tertunda'], 0, ',', '.') }} catatan audit yang sudah ada.</div>
                 </div>
             @elseif($utuh)
-                <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-brand-blue flex items-center justify-center shrink-0 border border-blue-200">
                     <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
                 </div>
                 <div>
-                    <div class="text-[0.9375rem] font-extrabold text-emerald-700">Rantai blok UTUH</div>
+                    <div class="text-[0.9375rem] font-extrabold text-navy">Rantai blok UTUH</div>
                     <div class="text-[0.8125rem] text-slate-500">Seluruh {{ $pemeriksaan['jumlah_blok'] }} blok diperiksa ulang barusan: tautan hash, proof of work, dan merkle root semuanya cocok.</div>
                 </div>
             @else
@@ -48,7 +70,7 @@
             </a>
             <form method="POST" action="{{ route('admin.blockchain.tambang') }}" class="m-0 form-proses">
                 @csrf
-                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-colors cursor-pointer disabled:opacity-60" data-teks-proses="Menambang…">
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-white bg-brand-blue hover:bg-blue-700 shadow-sm transition-colors cursor-pointer disabled:opacity-60" data-teks-proses="Menambang…">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
                     <span>Tambang Blok</span>
                     @if($pemeriksaan['transaksi_tertunda'] > 0)
@@ -58,17 +80,17 @@
             </form>
             <form method="POST" action="{{ route('admin.blockchain.tambang', ['async' => 1]) }}" class="m-0 form-proses">
                 @csrf
-                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-slate-700 bg-amber-50 hover:bg-amber-100 border border-amber-300 shadow-xs transition-colors cursor-pointer" title="Kirim penambangan ke Antrean Pekerja Terdistribusi (Queue Worker)">
-                    <svg class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 shadow-xs transition-colors cursor-pointer" title="Kirim penambangan ke Antrean Pekerja Terdistribusi (Queue Worker)">
+                    <svg class="w-4 h-4 text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
                     <span>Antrean Terdistribusi</span>
                     @if(isset($antreanWorker) && $antreanWorker > 0)
-                        <span class="bg-amber-500 text-white px-1.5 rounded-md text-[0.71875rem] font-extrabold animate-pulse">{{ $antreanWorker }}</span>
+                        <span class="bg-brand-blue text-white px-1.5 rounded-md text-[0.71875rem] font-extrabold">{{ $antreanWorker }}</span>
                     @endif
                 </button>
             </form>
             <form method="POST" action="{{ route('admin.blockchain.jangkarkan') }}" class="m-0 form-proses">
                 @csrf
-                <button type="submit" @disabled(! $jangkar['aktif']) class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-white bg-navy hover:bg-navy-light shadow-sm transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" data-teks-proses="Mengirim ke Ethereum…" title="{{ $jangkar['aktif'] ? 'Kirim hash blok yang belum terjangkar ke kontrak Ethereum' : 'Penjangkaran Ethereum belum diaktifkan di .env' }}">
+                <button type="submit" @disabled(! $jangkar['aktif']) class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-white bg-brand-blue hover:bg-blue-700 shadow-sm transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" data-teks-proses="Mengirim ke Ethereum…" title="{{ $jangkar['aktif'] ? 'Kirim hash blok yang belum terjangkar ke kontrak Ethereum' : 'Penjangkaran Ethereum belum diaktifkan di .env' }}">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="22" x2="12" y2="8"></line><path d="M5 12H2a10 10 0 0 0 20 0h-3"></path></svg>
                     <span>Jangkarkan ke Ethereum</span>
                     @if($jangkar['aktif'] && $jangkar['belum'] > 0)
@@ -88,12 +110,12 @@
         </div>
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4">
             <div class="text-[0.71875rem] font-bold uppercase tracking-wider text-slate-500">Catatan Tersegel</div>
-            <div class="text-[1.75rem] font-extrabold text-emerald-600 leading-tight mt-1">{{ number_format($pemeriksaan['transaksi_tercatat'], 0, ',', '.') }}</div>
+            <div class="text-[1.75rem] font-extrabold text-navy leading-tight mt-1">{{ number_format($pemeriksaan['transaksi_tercatat'], 0, ',', '.') }}</div>
             <div class="text-[0.75rem] text-slate-500">catatan audit di dalam blok</div>
         </div>
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4">
             <div class="text-[0.71875rem] font-bold uppercase tracking-wider text-slate-500">Menunggu Ditambang</div>
-            <div class="text-[1.75rem] font-extrabold {{ $pemeriksaan['transaksi_tertunda'] > 0 ? 'text-amber-500' : 'text-slate-400' }} leading-tight mt-1">{{ number_format($pemeriksaan['transaksi_tertunda'], 0, ',', '.') }}</div>
+            <div class="text-[1.75rem] font-extrabold {{ $pemeriksaan['transaksi_tertunda'] > 0 ? 'text-brand-blue' : 'text-slate-400' }} leading-tight mt-1">{{ number_format($pemeriksaan['transaksi_tertunda'], 0, ',', '.') }}</div>
             <div class="text-[0.75rem] text-slate-500">otomatis tiap 10 menit · kesulitan {{ $tingkatKesulitan }}</div>
         </div>
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4">
@@ -114,7 +136,7 @@
     </div>
 
     @if($jangkar['alamat_kontrak'])
-    <div class="bg-sky-50 border border-sky-200 rounded-xl px-4 py-3 text-[0.8125rem] text-sky-900 flex flex-wrap items-center gap-x-2 gap-y-1">
+    <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-[0.8125rem] text-slate-800 flex flex-wrap items-center gap-x-2 gap-y-1">
         <strong>Kontrak JangkarAudit:</strong>
         <code class="font-mono text-[0.75rem] break-all">{{ $jangkar['alamat_kontrak'] }}</code>
         @if($jangkar['url_kontrak'])
@@ -158,10 +180,10 @@
                         <svg class="w-8 h-6" viewBox="0 0 32 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="28" y2="12"></line><polyline points="22 6 28 12 22 18"></polyline></svg>
                     </div>
                 @endif
-                <a href="{{ route('admin.blockchain.show', $b->nomor) }}" class="shrink-0 w-[13.5rem] rounded-xl border-2 p-3 transition-all hover:-translate-y-0.5 hover:shadow-md {{ $valid ? 'border-emerald-300 bg-emerald-50/50' : 'border-rose-400 bg-rose-50' }}">
+                <a href="{{ route('admin.blockchain.show', $b->nomor) }}" class="shrink-0 w-[13.5rem] rounded-xl border-2 p-3 transition-all hover:-translate-y-0.5 hover:shadow-md {{ $valid ? 'border-blue-200 bg-blue-50/40 hover:border-brand-blue/60' : 'border-rose-400 bg-rose-50' }}">
                     <div class="flex items-center justify-between mb-2">
                         <span class="font-extrabold text-navy text-[0.9375rem]">{{ $b->isGenesis() ? 'Genesis' : 'Blok #'.$b->nomor }}</span>
-                        <span class="text-[0.71875rem] font-bold px-1.5 py-0.5 rounded {{ $valid ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white' }}">{{ $valid ? 'VALID' : 'RUSAK' }}</span>
+                        <span class="text-[0.71875rem] font-bold px-1.5 py-0.5 rounded {{ $valid ? 'bg-brand-blue text-white' : 'bg-rose-500 text-white' }}">{{ $valid ? 'VALID' : 'RUSAK' }}</span>
                     </div>
                     <dl class="text-[0.71875rem] leading-relaxed">
                         <dt class="text-slate-500">Hash sebelumnya</dt>
@@ -214,7 +236,7 @@
                             <td class="px-4 py-3 text-slate-600 whitespace-nowrap">{{ $b->ditambang_pada?->format('d/m/Y H:i:s') }}</td>
                             <td class="px-4 py-3">
                                 @if($valid)
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.71875rem] font-bold bg-emerald-100 text-emerald-700">✓ Valid</span>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.71875rem] font-bold bg-blue-50 text-brand-blue border border-blue-200">✓ Valid</span>
                                 @else
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.71875rem] font-bold bg-rose-100 text-rose-700">✗ Rusak</span>
                                 @endif

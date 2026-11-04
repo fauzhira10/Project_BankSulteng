@@ -22,6 +22,30 @@
     $nominalAwal = (int) preg_replace('/[^\d]/', '', (string) old('nominal_transaksi', $prefill['nominal_transaksi'] ?? ''));
 @endphp
 <div class="max-w-[59.375rem] mx-auto">
+
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-navy-dark via-blue-900 to-sky-700 rounded-2xl p-6 text-white mb-6 shadow-md flex justify-between items-center flex-wrap gap-4">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5 m-0 mb-1.5">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                <span>Input Data Jurnal Keluhan</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-white/85 m-0">Formulir pencatatan transaksi bermasalah, validasi nomor resi dan rekening, serta penentuan status tindak lanjut keluhan nasabah.</p>
+        </div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <a href="{{ route('jurnal.index') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-xl bg-white hover:bg-slate-100 text-navy font-bold text-xs shadow-xs transition-colors">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+                <span>Lihat Data Keluhan</span>
+            </a>
+        </div>
+    </div>
     @if($pengaduan)
         <div class="bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-4 mb-5 text-[0.8125rem] flex items-start gap-3 shadow-xs">
             <span class="text-lg leading-none">📨</span>
@@ -50,9 +74,6 @@
                 </svg>
                 <span>Formulir Pengaduan & Jurnal Transaksi</span>
             </div>
-            <span class="text-xs text-slate-500">
-                Semua Input Bertanda (<span class="text-rose-600 font-bold">*</span>) Wajib Diisi
-            </span>
         </div>
 
         <div class="p-6">
@@ -74,19 +95,19 @@
 
                     <!-- Nama Nasabah -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Nama Nasabah <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Nama Nasabah</label>
                         <input type="text" name="nama_nasabah" id="nama_nasabah" value="{{ old('nama_nasabah', $prefill['nama_nasabah'] ?? '') }}" required placeholder="Contoh: BUDI SANTOSO" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 uppercase transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none" oninput="this.value = this.value.toUpperCase()">
                     </div>
 
                     <!-- No. Rekening -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">No. Rekening <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">No. Rekening</label>
                         <input type="text" name="no_rekening" value="{{ old('no_rekening', $prefill['no_rekening'] ?? '') }}" required placeholder="Contoh: 00900000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- No. Resi / Trace Number -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">No. Resi / Trace Number <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">No. Resi / Trace Number</label>
                         <input type="text" name="no_resi" id="no_resi" value="{{ old('no_resi', $prefill['no_resi'] ?? '') }}" required placeholder="Contoh: 00000000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
@@ -102,7 +123,7 @@
 
                     <!-- Nomor Kartu -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Nomor Kartu ATM/Debit <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Nomor Kartu ATM/Debit</label>
                         <input type="text" name="no_kartu" value="{{ old('no_kartu', $prefill['no_kartu'] ?? '') }}" required placeholder="Contoh: 6019xxxxxxxxxxxx" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
@@ -116,8 +137,6 @@
                                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                     Dari pengaduan CS
                                 </span>
-                            @else
-                                <span class="text-rose-600 font-bold">*</span>
                             @endif
                         </label>
 
@@ -126,14 +145,8 @@
                                 <span class="inline-flex items-center px-3.5 py-2.5 bg-slate-100 text-slate-500 font-semibold text-[0.75rem] border-r border-slate-200 select-none">Nomor</span>
                                 <output class="block w-full px-3.5 py-2.5 text-sm font-mono font-bold text-navy tracking-wide">{{ $tiketDariPengaduan }}</output>
                             </div>
-                            <span class="text-[0.71875rem] text-slate-500 leading-snug">
-                                Nomor ini dibuat saat CS cabang mengirim keluhan dan tetap dipakai pada jurnal, sehingga satu keluhan bernomor sama dari awal sampai selesai.
-                            </span>
                         @else
                             <input type="text" name="no_tiket" id="no_tiket" value="{{ old('no_tiket') }}" required maxlength="255" placeholder="Contoh: BS-2026090412345" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 placeholder-slate-400 font-mono transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
-                            <span class="text-[0.71875rem] text-slate-500 leading-snug">
-                                Ketik nomor tiket sesuai berkas yang diterima. Nomor ini berasal dari proses sebelumnya (cabang, penyelia, lalu Divisi Literasi), jadi tidak dibuat dari Tanggal Terima Keluhan pada form ini.
-                            </span>
                         @endif
                     </div>
 
@@ -148,7 +161,7 @@
 
                     <!-- Cabang Transaksi / Pelapor -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Cabang Transaksi / Pelapor <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Cabang Transaksi / Pelapor</label>
                         <select name="master_cabang_id" id="cabang_id" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Kantor Cabang --</option>
                             @foreach($cabangs as $c)
@@ -161,7 +174,7 @@
 
                     <!-- Jenis Transaksi -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Jenis Transaksi <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Jenis Transaksi</label>
                         <select name="master_transaksi_id" id="transaksi_id" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Jenis Transaksi --</option>
                             @foreach($transaksis as $t)
@@ -174,7 +187,7 @@
 
                     <!-- Channel Transaksi (Dropdown) -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Channel Transaksi <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Channel Transaksi</label>
                         <select name="channel" id="channel" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Channel Transaksi --</option>
                             @php
@@ -204,9 +217,8 @@
                     <div class="flex flex-col gap-1.5 relative" id="admin_fee_combobox_container">
                         <div class="flex items-center justify-between">
                             <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">
-                                Biaya Admin (Rp) <span class="text-rose-600 font-bold">*</span>
+                                Biaya Admin (Rp)
                             </label>
-                            <span id="admin_fee_hint" class="text-[0.71875rem] text-slate-500 font-normal">Ketik bebas / pilih preset</span>
                         </div>
                         
                         <div id="admin_fee_input_wrapper" class="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-brand-blue focus-within:ring-3 focus-within:ring-brand-blue/15 transition-all duration-200">
@@ -309,7 +321,7 @@
 
                     <!-- Nominal Transaksi -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Biaya / Nominal Transaksi (Rp) <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Biaya / Nominal Transaksi (Rp)</label>
                         <div class="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-brand-blue focus-within:ring-3 focus-within:ring-brand-blue/15 transition-all duration-200">
                             <span class="inline-flex items-center px-3.5 py-2.5 bg-slate-50 text-slate-500 font-semibold text-xs border-r border-slate-200 select-none">
                                 Rp
@@ -336,14 +348,11 @@
                     <!-- Terminal Transaksi / Mesin ATM -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">
-                            Terminal Transaksi / Mesin ATM <span class="text-rose-600 font-bold">*</span>
+                            Terminal Transaksi / Mesin ATM
                         </label>
                         <select name="terminal_transaksi" id="terminal_transaksi" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                             <option value="">-- Pilih Mesin ATM / Terminal --</option>
                         </select>
-                        <span id="terminalHelperText" class="text-[0.71875rem] text-slate-500">
-                            Pilih mesin ATM langsung atau pilih kantor cabang terlebih dahulu.
-                        </span>
                     </div>
 
                     <!-- SECTION 3: WAKTU, STATUS & KRONOLOGI -->
@@ -357,27 +366,26 @@
 
                     <!-- Tanggal Transaksi -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Tanggal Transaksi Bermasalah <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Tanggal Transaksi Bermasalah</label>
                         <input type="date" name="tgl_transaksi" id="tgl_transaksi" value="{{ old('tgl_transaksi', $prefill['tgl_transaksi'] ?? '') }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Tanggal Terima -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Tanggal Terima Keluhan <span class="text-rose-600 font-bold">*</span></label>
+                        <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">Tanggal Terima Keluhan</label>
                         <input type="date" name="tgl_terima" id="tgl_terima" value="{{ old('tgl_terima', $prefill['tgl_terima'] ?? date('Y-m-d')) }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Tanggal Selesai -->
                     <div class="flex flex-col gap-1.5">
                         <label class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">
-                            Tanggal Selesai Penanganan 
-                             <span class ="text-rose-600 font-bold">*</span>
+                            Tanggal Selesai Penanganan
                         </label>
                         <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai') }}" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white text-slate-800 transition-all duration-200 focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     </div>
 
                     <!-- Status (bisa diketik manual atau pilih dari daftar standar) -->
-                    @include('partials.status_combobox', ['nilai' => old('status', 'Menunggu')])
+                    @include('partials.status_combobox', ['nilai' => old('status', 'Pending')])
 
                     <!-- Keterangan Keluhan -->
                     <div class="md:col-span-2 flex flex-col gap-1.5">
@@ -400,7 +408,7 @@
                         </svg>
                         <span>Reset Form</span>
                     </button>
-                    <button type="submit" id="btnSimpanJurnal" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 hover:shadow-lg shadow-brand-blue/25 transition-all cursor-pointer">
+                    <button type="submit" id="btnSimpanJurnal" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-brand-blue hover:bg-blue-700 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                             <polyline points="17 21 17 13 7 13 7 21"></polyline>

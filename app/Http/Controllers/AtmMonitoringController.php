@@ -36,12 +36,34 @@ class AtmMonitoringController extends Controller
         $selectedCabang = $request->input('master_cabang_id');
         $searchKeyword = trim((string)$request->input('q'));
 
-        // 2. Base Query Data Keluhan Berdasarkan Filter
+        // 2. Base Query Data Keluhan Berdasarkan Filter (Murni Fisik ATM Bank Sulteng)
+        $nonAtmKeywords = ['BANK LAIN', 'MOBILE BANKING', 'MBANKING', 'SMS BANKING', 'EDC', 'QRIS', 'INTERNET BANKING', 'LAKU PANDAI', 'TAMASYA'];
+
         $baseQuery = Jurnal::with(['masterCabang', 'masterTransaksi'])
             ->whereNotNull('terminal_transaksi')
             ->where('terminal_transaksi', '!=', '')
             ->where('terminal_transaksi', '!=', '-')
             ->whereYear('tgl_transaksi', $selectedYear);
+
+        // Kecualikan transaksi non-mesin ATM dari kolom terminal
+        foreach ($nonAtmKeywords as $kw) {
+            $baseQuery->where('terminal_transaksi', 'not like', "%{$kw}%");
+        }
+
+        // Kecualikan transaksi non-mesin atau off-us dari relasi master transaksi
+        $baseQuery->whereDoesntHave('masterTransaksi', function ($tQ) {
+            $tQ->where('channel', 'LIKE', '%ATM BERSAMA%')
+               ->orWhere('channel', 'LIKE', '%ATM LINK%')
+               ->orWhere('channel', 'LIKE', '%BANK LAIN%')
+               ->orWhere('channel', 'LIKE', '%MOBILE%')
+               ->orWhere('channel', 'LIKE', '%SMS%')
+               ->orWhere('channel', 'LIKE', '%QRIS%')
+               ->orWhere('channel', 'LIKE', '%DEBIT%')
+               ->orWhere('jenis_transaksi', 'LIKE', '%BANK LAIN%')
+               ->orWhere('jenis_transaksi', 'LIKE', '%MBANKING%')
+               ->orWhere('jenis_transaksi', 'LIKE', '%SMS BANKING%')
+               ->orWhere('jenis_transaksi', 'LIKE', '%QRIS%');
+        });
 
         if (!empty($selectedMonth)) {
             $baseQuery->whereMonth('tgl_transaksi', $selectedMonth);
@@ -55,11 +77,8 @@ class AtmMonitoringController extends Controller
             $baseQuery->where(function ($q) use ($searchKeyword) {
                 $cleanKeyword = strtoupper(trim($searchKeyword));
 
-                // 1. Channel non-mesin (Bank Lain, Mobile Banking)
-                if (str_contains($cleanKeyword, 'BANK LAIN') || str_contains($cleanKeyword, 'MOBILE') || str_contains($cleanKeyword, 'SMS')) {
-                    $q->where('terminal_transaksi', 'LIKE', "%{$searchKeyword}%");
-                } elseif (str_contains($cleanKeyword, '-')) {
-                    // 2. Format gabungan "ID - PROFIL" (misal: "452 - GRG.KCU1")
+                if (str_contains($cleanKeyword, '-')) {
+                    // 1. Format gabungan "ID - PROFIL" (misal: "452 - GRG.KCU1")
                     $parts = explode('-', $cleanKeyword, 2);
                     $idPart = trim($parts[0] ?? '');
                     $profilPart = trim($parts[1] ?? '');
@@ -70,12 +89,12 @@ class AtmMonitoringController extends Controller
                       ->orWhere('terminal_transaksi', 'LIKE', "% - {$profilPart}")
                       ->orWhere('terminal_transaksi', 'LIKE', "{$profilPart} %");
                 } elseif (preg_match('/^[A-Z0-9]+\.[A-Z0-9]+$/i', $cleanKeyword)) {
-                    // 3. Nama profil mesin spesifik (misal: GRG.KCU1)
+                    // 2. Nama profil mesin spesifik (misal: GRG.KCU1)
                     $q->where('terminal_transaksi', '=', $cleanKeyword)
                       ->orWhere('terminal_transaksi', 'LIKE', "% - {$cleanKeyword}")
                       ->orWhere('terminal_transaksi', 'LIKE', "{$cleanKeyword} %");
                 } else {
-                    // 4. Cek ke master ATM jika mencari ID LUNO
+                    // 3. Cek ke master ATM jika mencari ID LUNO
                     $atmMatch = MasterAtm::findAtmInfo($cleanKeyword);
                     if ($atmMatch && !empty($atmMatch['profil'])) {
                         $prof = $atmMatch['profil'];
@@ -103,6 +122,18 @@ class AtmMonitoringController extends Controller
 
         foreach ($allJurnals as $j) {
             $termKey = strtoupper(trim($j->terminal_transaksi));
+
+            // Validasi filter non-mesin ATM
+            $isNonAtm = false;
+            foreach ($nonAtmKeywords as $kw) {
+                if (str_contains($termKey, $kw)) {
+                    $isNonAtm = true;
+                    break;
+                }
+            }
+            if ($isNonAtm) {
+                continue;
+            }
             $cabangId = $j->master_cabang_id;
             $cabangNama = $j->masterCabang->nama_cabang ?? 'Kantor Cabang';
             $cabangKode = $j->masterCabang->kode_cabang ?? '-';

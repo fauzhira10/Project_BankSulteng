@@ -176,13 +176,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--color-brand-blue) 0%, var(--color-navy) 100%);
+    background-color: var(--color-brand-blue);
     color: #ffffff;
 }
 
 .btn-primary:hover {
-    opacity: 0.95;
-    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+    background-color: #0052a3;
+    box-shadow: 0 2px 6px rgba(0, 102, 204, 0.25);
 }
 
 .btn-secondary {
@@ -203,9 +203,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .btn-export-excel {
-    background-color: #059669;
+    background-color: #0066CC;
     color: #ffffff !important;
-    border: 1px solid #047857;
+    border: 1px solid #0052a3;
     padding: 7px 14px;
     font-size: 0.8125rem;
     font-weight: 600;
@@ -220,16 +220,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .btn-export-excel:hover {
-    background-color: #047857;
-    border-color: #065f46;
+    background-color: #0052a3;
+    border-color: #0B2F64;
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(0, 102, 204, 0.25);
 }
 
 .btn-import-excel {
-    background-color: #0284c7;
+    background-color: #0066CC;
     color: #ffffff !important;
-    border: 1px solid #0369a1;
+    border: 1px solid #0052a3;
     padding: 7px 14px;
     font-size: 0.8125rem;
     font-weight: 600;
@@ -244,10 +244,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .btn-import-excel:hover {
-    background-color: #0369a1;
-    border-color: #075985;
+    background-color: #0052a3;
+    border-color: #0B2F64;
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(0, 102, 204, 0.25);
 }
 
 .btn-reset-all {
@@ -733,6 +733,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .upload-dropzone:hover,
@@ -745,7 +749,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     width: 44px;
     height: 44px;
     color: #0284c7;
-    margin-bottom: 10px;
+    margin: 0 auto 10px auto;
+    display: block;
 }
 
 /* Import Step Tracker */
@@ -802,6 +807,25 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .import-step-item.completed .import-step-badge {
     background-color: #059669;
+    color: #ffffff;
+}
+
+/* Scoped Blue Theme for Export Excel Modal */
+#exportProgressModal .import-step-item.active {
+    color: #0066CC;
+    font-weight: 700;
+}
+#exportProgressModal .import-step-item.active .import-step-badge {
+    background-color: #0066CC;
+    color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
+}
+#exportProgressModal .import-step-item.completed {
+    color: #0B2F64;
+    font-weight: 600;
+}
+#exportProgressModal .import-step-item.completed .import-step-badge {
+    background-color: #0066CC;
     color: #ffffff;
 }
 
@@ -1099,11 +1123,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .page-btn.active {
-    background-color: var(--color-navy);
-    border-color: var(--color-navy);
+    background-color: var(--color-brand-blue);
+    border-color: var(--color-brand-blue);
     color: #ffffff;
     font-weight: 700;
-    box-shadow: 0 2px 4px rgba(11, 47, 84, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 102, 204, 0.25);
 }
 
 .page-btn.disabled {

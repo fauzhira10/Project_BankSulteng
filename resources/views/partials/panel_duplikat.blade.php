@@ -65,7 +65,7 @@
                     @php
                         $st = strtolower(trim($lama->status ?? '-'));
                         $kelasStatus = match($st) {
-                            'menunggu' => 'badge-menunggu',
+                            'menunggu', 'pending' => 'badge-menunggu',
                             'success' => 'badge-success',
                             'done' => 'badge-done',
                             'rejected' => 'badge-rejected',

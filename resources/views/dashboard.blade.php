@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Ringkasan performa penyelesaian keluhan, tren, cabang, & channel transaksi')
 
 @section('topbar_action')
-    <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-4 rounded-xl bg-gradient-to-r from-brand-blue to-navy text-white text-xs font-bold shadow-sm shadow-brand-blue/20 hover:brightness-110 transition-all">
+    <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-4 rounded-xl bg-brand-blue hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -16,25 +16,32 @@
 
 @section('content')
 {{-- ================= HERO BANNER ================= --}}
-<div class="bg-gradient-to-r from-navy-dark via-navy to-brand-blue rounded-2xl p-6 text-white mb-5 shadow-md flex justify-between items-center flex-wrap gap-4 relative overflow-hidden">
+<div class="bg-gradient-to-r from-navy-dark via-blue-900 to-sky-700 rounded-2xl p-6 text-white mb-6 shadow-md flex justify-between items-center flex-wrap gap-4 relative overflow-hidden">
     <div class="relative z-10">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-semibold text-amber-300 mb-2 border border-white/20">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-semibold text-blue-100 mb-2 border border-white/20">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>Sistem E-Jurnal Keluhan Nasabah Aktif</span>
         </div>
         <h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2.5 m-0 mb-1 leading-tight">
             Selamat Datang, {{ Auth::user()->name ?? 'Petugas Bank Sulteng' }}!
         </h1>
-        <p class="text-xs sm:text-sm text-slate-200 m-0 max-w-2xl">
+        <p class="text-xs sm:text-sm text-blue-100/90 m-0 max-w-2xl">
             Pantau ringkasan penyelesaian keluhan nasabah, performa terminal mesin ATM, serta status transaksi perbankan secara real-time.
         </p>
     </div>
 
     <div class="relative z-10 flex items-center gap-3">
-        <div class="text-right hidden md:block">
-            <div class="text-[0.71875rem] uppercase tracking-wider text-blue-200 font-semibold">Total Kasus Aktif</div>
-            <div class="text-2xl font-black text-amber-300 leading-tight">{{ number_format($totalKasus, 0, ',', '.') }}</div>
+        <div class="text-right hidden md:block mr-1">
+            <div class="text-[0.71875rem] uppercase tracking-wider text-blue-200 font-semibold">Total Kasus</div>
+            <div class="text-2xl font-extrabold text-white leading-tight">{{ number_format($totalKasus, 0, ',', '.') }}</div>
         </div>
+        <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-4 rounded-xl bg-white hover:bg-slate-100 text-navy font-bold text-xs shadow-xs transition-colors">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>+ Input Jurnal Baru</span>
+        </a>
     </div>
 
     <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
@@ -335,8 +342,8 @@
                                 @php $st = strtolower($jurnal->status); @endphp
                                 @if($st == 'success')
                                     <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold bg-emerald-100 text-emerald-700">Success</span>
-                                @elseif($st == 'menunggu')
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold bg-amber-100 text-amber-700">Menunggu</span>
+                                @elseif($st == 'menunggu' || $st == 'pending')
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold bg-amber-100 text-amber-700">Pending</span>
                                 @elseif($st == 'done')
                                     <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.71875rem] font-extrabold bg-sky-100 text-sky-700">Done</span>
                                 @elseif($st == 'rejected')
@@ -398,46 +405,6 @@
     </div>
 </div>
 
-{{-- ================= QUICK ACCESS FOOTER ================= --}}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-    <a href="{{ route('jurnal.create') }}" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-3 group">
-        <div class="w-11 h-11 rounded-xl bg-sky-100 group-hover:bg-brand-blue text-sky-600 group-hover:text-white flex items-center justify-center shrink-0 transition-all">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
-        </div>
-        <div>
-            <div class="text-xs font-extrabold text-navy">Input Keluhan Baru</div>
-            <div class="text-[0.71875rem] text-slate-500">Catat keluhan nasabah baru</div>
-        </div>
-    </a>
-    <a href="{{ route('laporan.index') }}" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-3 group">
-        <div class="w-11 h-11 rounded-xl bg-emerald-100 group-hover:bg-emerald-600 text-emerald-600 group-hover:text-white flex items-center justify-center shrink-0 transition-all">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"></line>
-                <line x1="12" y1="20" x2="12" y2="4"></line>
-                <line x1="6" y1="20" x2="6" y2="14"></line>
-            </svg>
-        </div>
-        <div>
-            <div class="text-xs font-extrabold text-navy">Laporan Rekap Bulanan</div>
-            <div class="text-[0.71875rem] text-slate-500">Matriks 12 bulan &amp; export Excel</div>
-        </div>
-    </a>
-    <a href="{{ route('atm.index') }}" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-3 group">
-        <div class="w-11 h-11 rounded-xl bg-amber-100 group-hover:bg-amber-600 text-amber-600 group-hover:text-white flex items-center justify-center shrink-0 transition-all">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-            </svg>
-        </div>
-        <div>
-            <div class="text-xs font-extrabold text-navy">Monitoring ATM</div>
-            <div class="text-[0.71875rem] text-slate-500">Peringkat &amp; drill-down mesin</div>
-        </div>
-    </a>
-</div>
 @endsection
 
 @push('styles')
@@ -539,7 +506,7 @@
         new ApexCharts(document.querySelector('#statusDonutChart'), {
             chart: { type: 'donut', height: 320, fontFamily: 'inherit' },
             series: statusSeries,
-            labels: ['Menunggu', 'Success', 'Done', 'Rejected'],
+            labels: ['Pending', 'Success', 'Done', 'Rejected'],
             colors: ['#f59e0b', '#10b981', '#0284c7', '#e11d48'],
             stroke: { width: 2, colors: ['#fff'] },
             plotOptions: {

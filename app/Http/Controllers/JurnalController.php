@@ -34,7 +34,7 @@ class JurnalController extends Controller
      * Status baku yang ikut dihitung pada kartu ringkasan & rekap laporan.
      * Petugas tetap boleh mengetik status lain secara manual pada form jurnal.
      */
-    public const STATUS_STANDAR = ['-', 'Menunggu', 'Success', 'Done', 'Rejected'];
+    public const STATUS_STANDAR = ['-', 'Pending', 'Menunggu', 'Success', 'Done', 'Rejected'];
 
     /**
      * Merapikan status yang diketik manual: spasi berlebih dibuang dan penulisan
@@ -206,7 +206,7 @@ class JurnalController extends Controller
         // Hitung Ringkasan Statistik
         $stats = [
             'total' => Jurnal::count(),
-            'menunggu' => Jurnal::where('status', 'Menunggu')->count(),
+            'menunggu' => Jurnal::whereIn('status', ['Menunggu', 'Pending'])->count(),
             'success' => Jurnal::where('status', 'Success')->count(),
             'done' => Jurnal::where('status', 'Done')->count(),
             'rejected' => Jurnal::where('status', 'Rejected')->count(),
@@ -938,268 +938,6 @@ class JurnalController extends Controller
             $sheet1->getStyle("A4:Q{$endRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setRGB('CBD5E1');
             $sheet1->getStyle("A4:Q{$endRow}")->getFont()->setName('Calibri')->setSize(10);
         }
-
-        // 2. SHEET 2: FORMAT_SLIP_JURNAL
-        $sheet2 = $spreadsheet->createSheet();
-        $sheet2->setTitle('FORMAT_SLIP_JURNAL');
-
-        $sheet2->setCellValue('B2', 'PT BANK SULTENG');
-        $sheet2->setCellValue('B3', 'LEMBAR SLIP JURNAL PENANGANAN KELUHAN NASABAH');
-        $sheet2->setCellValue('B4', 'Pilih No. Urut Transaksi (Diinput pada Sel C6 di bawah):');
-        $sheet2->mergeCells('B2:G2');
-        $sheet2->mergeCells('B3:G3');
-        $sheet2->mergeCells('B4:G4');
-
-        $sheet2->getStyle('B2')->getFont()->setName('Segoe UI')->setSize(16)->setBold(true)->getColor()->setRGB('0B2F64');
-        $sheet2->getStyle('B3')->getFont()->setName('Segoe UI')->setSize(11)->setBold(true)->getColor()->setRGB('0066CC');
-        $sheet2->getStyle('B4')->getFont()->setName('Segoe UI')->setSize(9.5)->setItalic(true)->getColor()->setRGB('64748B');
-
-        $sheet2->setCellValue('B6', 'PILIH NO. URUT:');
-        $sheet2->setCellValue('C6', 1);
-        $sheet2->setCellValue('D6', '<-- (Ganti nomor urut ini untuk memilih nasabah)');
-        $sheet2->getStyle('B6')->getFont()->setName('Segoe UI')->setBold(true)->setSize(11)->getColor()->setRGB('0B2F64');
-        $sheet2->getStyle('C6')->getFont()->setName('Segoe UI')->setBold(true)->setSize(13)->getColor()->setRGB('B45309');
-        $sheet2->getStyle('C6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet2->getStyle('C6')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FEF3C7');
-        $sheet2->getStyle('C6')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM)->getColor()->setRGB('F59E0B');
-        $sheet2->getStyle('D6')->getFont()->setName('Segoe UI')->setItalic(true)->setSize(9)->getColor()->setRGB('94A3B8');
-
-        $sheet2->setCellValue('B8', 'I. INFORMASI NASABAH & IDENTITAS');
-        $sheet2->mergeCells('B8:G8');
-        $sheet2->getStyle('B8')->getFont()->setName('Segoe UI')->setBold(true)->setSize(10.5)->getColor()->setRGB('FFFFFF');
-        $sheet2->getStyle('B8:G8')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('0B2F64');
-
-        $maxLookup = max(1000, count($jurnals) + 50);
-
-        $slipFields1 = [
-            9 => ['Nama Nasabah',        '=IFERROR(INDEX(KELUHAN!$B$4:$B$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            10 => ['Nomor Rekening',      '=IFERROR(INDEX(KELUHAN!$H$4:$H$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            11 => ['Nomor Resi / Trace',  '=IFERROR(INDEX(KELUHAN!$I$4:$I$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            12 => ['Nomor Kartu ATM',     '=IFERROR(INDEX(KELUHAN!$G$4:$G$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            13 => ['Nomor Tiket CS',      '=IFERROR(INDEX(KELUHAN!$F$4:$F$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            14 => ['Kantor Cabang',       '=IFERROR(INDEX(KELUHAN!$M$4:$M$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-        ];
-
-        foreach ($slipFields1 as $row => [$label, $formula]) {
-            $sheet2->setCellValue("B{$row}", $label);
-            $sheet2->setCellValue("D{$row}", $formula);
-            $sheet2->mergeCells("B{$row}:C{$row}");
-            $sheet2->mergeCells("D{$row}:G{$row}");
-            $sheet2->getStyle("B{$row}")->getFont()->setName('Segoe UI')->setBold(true)->setSize(10)->getColor()->setRGB('334155');
-            $sheet2->getStyle("D{$row}")->getFont()->setName('Segoe UI')->setSize(10)->getColor()->setRGB('0F172A');
-        }
-
-        $sheet2->setCellValue('B16', 'II. RINCIAN TRANSAKSI & FINANSIAL');
-        $sheet2->mergeCells('B16:G16');
-        $sheet2->getStyle('B16')->getFont()->setName('Segoe UI')->setBold(true)->setSize(10.5)->getColor()->setRGB('FFFFFF');
-        $sheet2->getStyle('B16:G16')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('0B2F64');
-
-        $slipFields2 = [
-            17 => ['Jenis Transaksi',     '=IFERROR(INDEX(KELUHAN!$J$4:$J$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            18 => ['Channel Pembayaran',  '=IFERROR(INDEX(KELUHAN!$L$4:$L$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            19 => ['Terminal / ATM',      '=IFERROR(INDEX(KELUHAN!$N$4:$N$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            20 => ['Nominal Transaksi',   '=IFERROR(INDEX(KELUHAN!$O$4:$O$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), 0)'],
-            21 => ['Biaya Admin',         '=IFERROR(INDEX(KELUHAN!$K$4:$K$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), 0)'],
-            22 => ['Status Penyelesaian', '=IFERROR(INDEX(KELUHAN!$Q$4:$Q$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-        ];
-
-        foreach ($slipFields2 as $row => [$label, $formula]) {
-            $sheet2->setCellValue("B{$row}", $label);
-            $sheet2->setCellValue("D{$row}", $formula);
-            $sheet2->mergeCells("B{$row}:C{$row}");
-            $sheet2->mergeCells("D{$row}:G{$row}");
-            $sheet2->getStyle("B{$row}")->getFont()->setName('Segoe UI')->setBold(true)->setSize(10)->getColor()->setRGB('334155');
-            $sheet2->getStyle("D{$row}")->getFont()->setName('Segoe UI')->setSize(10)->getColor()->setRGB('0F172A');
-        }
-        $sheet2->getStyle('D20:D21')->getNumberFormat()->setFormatCode('"Rp " #,##0');
-        $sheet2->getStyle('D20')->getFont()->setBold(true)->getColor()->setRGB('047857');
-
-        $sheet2->setCellValue('B24', 'III. HISTORI TANGGAL & KETERANGAN');
-        $sheet2->mergeCells('B24:G24');
-        $sheet2->getStyle('B24')->getFont()->setName('Segoe UI')->setBold(true)->setSize(10.5)->getColor()->setRGB('FFFFFF');
-        $sheet2->getStyle('B24:G24')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('0B2F64');
-
-        $slipFields3 = [
-            25 => ['Tgl Transaksi',  '=IFERROR(INDEX(KELUHAN!$E$4:$E$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            26 => ['Tgl Terima CS',  '=IFERROR(INDEX(KELUHAN!$C$4:$C$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            27 => ['Tgl Selesai',    '=IFERROR(INDEX(KELUHAN!$D$4:$D$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-            28 => ['Keterangan Log', '=IFERROR(INDEX(KELUHAN!$P$4:$P$'.$maxLookup.', MATCH($C$6, KELUHAN!$A$4:$A$'.$maxLookup.', 0)), "-")'],
-        ];
-
-        foreach ($slipFields3 as $row => [$label, $formula]) {
-            $sheet2->setCellValue("B{$row}", $label);
-            $sheet2->setCellValue("D{$row}", $formula);
-            $sheet2->mergeCells("B{$row}:C{$row}");
-            $sheet2->mergeCells("D{$row}:G{$row}");
-            $sheet2->getStyle("B{$row}")->getFont()->setName('Segoe UI')->setBold(true)->setSize(10)->getColor()->setRGB('334155');
-            $sheet2->getStyle("D{$row}")->getFont()->setName('Segoe UI')->setSize(10)->getColor()->setRGB('0F172A');
-        }
-        $sheet2->getRowDimension(28)->setRowHeight(35);
-        $sheet2->getStyle('D28')->getAlignment()->setWrapText(true);
-
-        $boxBorder = [
-            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'CBD5E1']]],
-        ];
-        $sheet2->getStyle('B8:G14')->applyFromArray($boxBorder);
-        $sheet2->getStyle('B16:G22')->applyFromArray($boxBorder);
-        $sheet2->getStyle('B24:G28')->applyFromArray($boxBorder);
-
-        $sheet2->setCellValue('B31', 'Dibuat Oleh,');
-        $sheet2->setCellValue('B32', 'Petugas CS / Teller');
-        $sheet2->setCellValue('B36', '( ........................................ )');
-        $sheet2->mergeCells('B31:C31');
-        $sheet2->mergeCells('B32:C32');
-        $sheet2->mergeCells('B36:C36');
-        $sheet2->getStyle('B31:C36')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        $sheet2->setCellValue('D31', 'Diverifikasi Oleh,');
-        $sheet2->setCellValue('D32', 'Penyelia / Supervisor');
-        $sheet2->setCellValue('D36', '( ........................................ )');
-        $sheet2->mergeCells('D31:E31');
-        $sheet2->mergeCells('D32:E32');
-        $sheet2->mergeCells('D36:E36');
-        $sheet2->getStyle('D31:E36')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        $sheet2->setCellValue('F31', 'Disetujui Oleh,');
-        $sheet2->setCellValue('F32', 'Pimpinan Seksi / Cabang');
-        $sheet2->setCellValue('F36', '( ........................................ )');
-        $sheet2->mergeCells('F31:G31');
-        $sheet2->mergeCells('F32:G32');
-        $sheet2->mergeCells('F36:G36');
-        $sheet2->getStyle('F31:G36')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet2->getStyle('B31:G36')->getFont()->setName('Segoe UI')->setSize(9.5)->getColor()->setRGB('334155');
-
-        $sheet2->getColumnDimension('A')->setWidth(4);
-        $sheet2->getColumnDimension('B')->setWidth(18);
-        $sheet2->getColumnDimension('C')->setWidth(18);
-        $sheet2->getColumnDimension('D')->setWidth(18);
-        $sheet2->getColumnDimension('E')->setWidth(18);
-        $sheet2->getColumnDimension('F')->setWidth(18);
-        $sheet2->getColumnDimension('G')->setWidth(18);
-
-        // 3. SHEET 3: REKAP_STATUS_CABANG
-        $sheet3 = $spreadsheet->createSheet();
-        $sheet3->setTitle('REKAP_STATUS_CABANG');
-
-        $sheet3->setCellValue('A1', 'PT BANK SULTENG - REKAPITULASI STATUS & AGREGASI KELUHAN');
-        $sheet3->setCellValue('A2', 'Ringkasan Eksekutif & Statistik Otomatis Berdasarkan Data Master');
-        $sheet3->mergeCells('A1:F1');
-        $sheet3->mergeCells('A2:F2');
-
-        $sheet3->getStyle('A1')->getFont()->setName('Segoe UI')->setSize(14)->setBold(true)->getColor()->setRGB('0B2F64');
-        $sheet3->getStyle('A2')->getFont()->setName('Segoe UI')->setSize(10)->setItalic(true)->getColor()->setRGB('64748B');
-
-        $sheet3->setCellValue('A4', 'I. REKAPITULASI BERDASARKAN STATUS PENYELESAIAN');
-        $sheet3->mergeCells('A4:D4');
-        $sheet3->getStyle('A4')->getFont()->setName('Segoe UI')->setBold(true)->setSize(11)->getColor()->setRGB('0B2F64');
-
-        $sheet3->setCellValue('A5', 'Status Keluhan');
-        $sheet3->setCellValue('B5', 'Jumlah Transaksi');
-        $sheet3->setCellValue('C5', 'Total Nominal (Rp)');
-        $sheet3->setCellValue('D5', 'Persentase (%)');
-        $sheet3->getStyle('A5:D5')->applyFromArray($headerStyle);
-
-        $statusList = [
-            ['Menunggu', 6],
-            ['Success',  7],
-            ['Done',     8],
-            ['Rejected', 9],
-        ];
-
-        foreach ($statusList as [$st, $r]) {
-            $sheet3->setCellValue("A{$r}", $st);
-            $sheet3->setCellValue("B{$r}", '=COUNTIF(KELUHAN!$Q$4:$Q$'.$maxLookup.', "'.$st.'")');
-            $sheet3->setCellValue("C{$r}", '=SUMIFS(KELUHAN!$O$4:$O$'.$maxLookup.', KELUHAN!$Q$4:$Q$'.$maxLookup.', "'.$st.'")');
-            $sheet3->setCellValue("D{$r}", "=IF(B10>0, B{$r}/B10, 0)");
-            $sheet3->getStyle("A{$r}")->getFont()->setName('Segoe UI')->setBold(true);
-            $sheet3->getStyle("B{$r}:D{$r}")->getFont()->setName('Segoe UI');
-            $sheet3->getStyle("B{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet3->getStyle("C{$r}")->getNumberFormat()->setFormatCode('"Rp " #,##0');
-            $sheet3->getStyle("D{$r}")->getNumberFormat()->setFormatCode('0.0%');
-        }
-
-        $sheet3->setCellValue('A10', 'TOTAL KESELURUHAN');
-        $sheet3->setCellValue('B10', '=SUM(B6:B9)');
-        $sheet3->setCellValue('C10', '=SUM(C6:C9)');
-        $sheet3->setCellValue('D10', '=SUM(D6:D9)');
-
-        $totalStyle = [
-            'font' => ['name' => 'Segoe UI', 'bold' => true, 'color' => ['rgb' => '0B2F64']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2E8F0']],
-            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => '94A3B8']]],
-        ];
-        $sheet3->getStyle('A10:D10')->applyFromArray($totalStyle);
-        $sheet3->getStyle('B10')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet3->getStyle('C10')->getNumberFormat()->setFormatCode('"Rp " #,##0');
-        $sheet3->getStyle('D10')->getNumberFormat()->setFormatCode('0.0%');
-        $sheet3->getStyle('A5:D10')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setRGB('CBD5E1');
-        $sheet3->getStyle('A10:D10')->getBorders()->getTop()->setBorderStyle(Border::BORDER_DOUBLE)->getColor()->setRGB('0B2F64');
-
-        $sheet3->setCellValue('A13', 'II. REKAPITULASI PER KANTOR CABANG');
-        $sheet3->mergeCells('A13:F13');
-        $sheet3->getStyle('A13')->getFont()->setName('Segoe UI')->setBold(true)->setSize(11)->getColor()->setRGB('0B2F64');
-
-        $sheet3->setCellValue('A14', 'Kode');
-        $sheet3->setCellValue('B14', 'Nama Kantor Cabang');
-        $sheet3->setCellValue('C14', 'Total Transaksi');
-        $sheet3->setCellValue('D14', 'Menunggu');
-        $sheet3->setCellValue('E14', 'Selesai (Success/Done)');
-        $sheet3->setCellValue('F14', 'Total Nominal (Rp)');
-        $sheet3->getStyle('A14:F14')->applyFromArray($headerStyle);
-
-        $cabangData = [
-            ['001', 'Kantor Cabang Utama Palu'],
-            ['002', 'Kantor Cabang Parigi'],
-            ['003', 'Kantor Cabang Poso'],
-            ['004', 'Kantor Cabang Tolitoli'],
-            ['005', 'Kantor Cabang Luwuk'],
-            ['006', 'Kantor Cabang Buol'],
-            ['007', 'Kantor Cabang Donggala'],
-            ['008', 'Kantor Cabang Banggai'],
-            ['009', 'Kantor Cabang Tinombo'],
-            ['010', 'Kantor Cabang Morowali'],
-            ['011', 'Kantor Cabang Ampana'],
-            ['012', 'Kantor Cabang Sigi'],
-            ['013', 'Kantor Cabang Kolonodale'],
-            ['014', 'Kantor Cabang Salakan'],
-            ['015', 'Kantor Cabang Jakarta'],
-        ];
-
-        $rowCabang = 15;
-        foreach ($cabangData as [$kode, $nama]) {
-            $sheet3->setCellValue("A{$rowCabang}", $kode);
-            $sheet3->setCellValue("B{$rowCabang}", $nama);
-            $sheet3->setCellValue("C{$rowCabang}", '=COUNTIF(KELUHAN!$M$4:$M$'.$maxLookup.', "*'.$kode.'*")');
-            $sheet3->setCellValue("D{$rowCabang}", '=COUNTIFS(KELUHAN!$M$4:$M$'.$maxLookup.', "*'.$kode.'*", KELUHAN!$Q$4:$Q$'.$maxLookup.', "Menunggu")');
-            $sheet3->setCellValue("E{$rowCabang}", '=COUNTIFS(KELUHAN!$M$4:$M$'.$maxLookup.', "*'.$kode.'*", KELUHAN!$Q$4:$Q$'.$maxLookup.', "Success") + COUNTIFS(KELUHAN!$M$4:$M$'.$maxLookup.', "*'.$kode.'*", KELUHAN!$Q$4:$Q$'.$maxLookup.', "Done")');
-            $sheet3->setCellValue("F{$rowCabang}", '=SUMIFS(KELUHAN!$O$4:$O$'.$maxLookup.', KELUHAN!$M$4:$M$'.$maxLookup.', "*'.$kode.'*")');
-
-            $sheet3->getStyle("A{$rowCabang}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet3->getStyle("C{$rowCabang}:E{$rowCabang}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet3->getStyle("F{$rowCabang}")->getNumberFormat()->setFormatCode('"Rp " #,##0');
-            $sheet3->getStyle("A{$rowCabang}:F{$rowCabang}")->getFont()->setName('Segoe UI')->setSize(9.5);
-
-            $rowCabang++;
-        }
-
-        $sheet3->setCellValue("A{$rowCabang}", 'TOTAL');
-        $sheet3->setCellValue("B{$rowCabang}", 'Seluruh Cabang');
-        $sheet3->setCellValue("C{$rowCabang}", '=SUM(C15:C'.($rowCabang - 1).')');
-        $sheet3->setCellValue("D{$rowCabang}", '=SUM(D15:D'.($rowCabang - 1).')');
-        $sheet3->setCellValue("E{$rowCabang}", '=SUM(E15:E'.($rowCabang - 1).')');
-        $sheet3->setCellValue("F{$rowCabang}", '=SUM(F15:F'.($rowCabang - 1).')');
-
-        $sheet3->getStyle("A{$rowCabang}:F{$rowCabang}")->applyFromArray($totalStyle);
-        $sheet3->getStyle("C{$rowCabang}:E{$rowCabang}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet3->getStyle("F{$rowCabang}")->getNumberFormat()->setFormatCode('"Rp " #,##0');
-        $sheet3->getStyle("A14:F{$rowCabang}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setRGB('CBD5E1');
-
-        $sheet3->getColumnDimension('A')->setWidth(10);
-        $sheet3->getColumnDimension('B')->setWidth(30);
-        $sheet3->getColumnDimension('C')->setWidth(16);
-        $sheet3->getColumnDimension('D')->setWidth(16);
-        $sheet3->getColumnDimension('E')->setWidth(24);
-        $sheet3->getColumnDimension('F')->setWidth(24);
 
         $spreadsheet->setActiveSheetIndex(0);
 
@@ -2065,7 +1803,7 @@ class JurnalController extends Controller
 
         // 4. Status Menunggu / Pending / On Progress
         if (str_contains($s, 'menunggu') || str_contains($s, 'pending') || str_contains($s, 'progress') || str_contains($s, 'proses')) {
-            return 'Menunggu';
+            return 'Pending';
         }
 
         // 5. Default jika ada teks lain di excel, simpan nilai aslinya atau '-'
@@ -2423,10 +2161,10 @@ class JurnalController extends Controller
     {
         $jurnal = Jurnal::with(['masterCabang', 'masterTransaksi'])->findOrFail($id);
 
-        // Validasi: Status 'Menunggu' belum dapat dicetak untuk keluhan nasabah
-        if (strtolower(trim($jurnal->status ?? '')) === 'menunggu') {
+        // Validasi: Status 'Pending' / 'Menunggu' belum dapat dicetak untuk keluhan nasabah
+        if (in_array(strtolower(trim($jurnal->status ?? '')), ['menunggu', 'pending'])) {
             return redirect()->route('jurnal.preview', $jurnal->id)
-                ->with('error', "Dokumen keluhan nasabah {$jurnal->nama_nasabah} (Tiket: {$jurnal->no_tiket}) belum dapat dicetak karena status saat ini masih Menunggu. Silakan perbarui status penyelesaian keluhan terlebih dahulu.");
+                ->with('error', "Dokumen keluhan nasabah {$jurnal->nama_nasabah} (Tiket: {$jurnal->no_tiket}) belum dapat dicetak karena status saat ini masih Pending. Silakan perbarui status penyelesaian keluhan terlebih dahulu.");
         }
 
         $format = strtolower(trim($request->query('format', '')));

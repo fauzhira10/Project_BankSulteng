@@ -246,7 +246,7 @@ class DataWarehouseEtlService
                 }
 
                 // Kalkulasi Metrik Fakta (Business Metrics Transformation)
-                $statusNormalized = trim($j->status ?: 'Menunggu');
+                $statusNormalized = trim($j->status ?: 'Pending');
                 $isSelesai = in_array(strtolower($statusNormalized), ['done', 'success'], true);
 
                 // Data Cleansing: Normalisasi durasi penyelesaian jika ada input tanggal yang terbalik

@@ -18,7 +18,7 @@
             <button type="button" id="mkBatal" class="px-5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-semibold text-[0.84375rem] transition-colors cursor-pointer min-w-[6.25rem]">
                 Batal
             </button>
-            <button type="button" id="mkLanjut" class="px-5 py-2 rounded-lg text-white font-semibold text-[0.84375rem] shadow-md transition-colors cursor-pointer min-w-[7.5rem] bg-navy hover:opacity-90">
+            <button type="button" id="mkLanjut" class="px-5 py-2 rounded-lg text-white font-semibold text-[0.84375rem] shadow-md transition-colors cursor-pointer min-w-[7.5rem] bg-brand-blue hover:bg-[#0052a3]">
                 Ya, Lanjutkan
             </button>
         </div>
@@ -39,7 +39,7 @@
         emerald: { ikon: 'bg-emerald-100', tombol: 'bg-emerald-600 hover:bg-emerald-700' },
         rose:    { ikon: 'bg-rose-100',    tombol: 'bg-rose-600 hover:bg-rose-700' },
         amber:   { ikon: 'bg-amber-100',   tombol: 'bg-amber-500 hover:bg-amber-600' },
-        navy:    { ikon: 'bg-slate-100',   tombol: 'bg-navy hover:opacity-90' },
+        navy:    { ikon: 'bg-blue-50',     tombol: 'bg-brand-blue hover:bg-[#0052a3]' },
     };
     const semuaKelasIkon = Object.values(gaya).map(g => g.ikon);
     const semuaKelasTombol = Object.values(gaya).flatMap(g => g.tombol.split(' '));

@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Kelola akun Admin Pusat dan Customer Service cabang')
 
 @section('topbar_action')
-    <a href="{{ route('admin.pengguna.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 text-xs font-semibold shadow-sm transition-opacity">
+    <a href="{{ route('admin.pengguna.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg bg-brand-blue hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -17,6 +17,31 @@
 @section('content')
 <div class="max-w-[71.875rem] mx-auto">
 
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-navy-dark via-blue-900 to-sky-700 rounded-2xl p-6 text-white mb-6 shadow-md flex justify-between items-center flex-wrap gap-4">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5 m-0 mb-1.5">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>Manajemen Pengguna &amp; Hak Akses</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-white/85 m-0">Kelola akun administrator pusat dan customer service cabang PT Bank Sulteng.</p>
+        </div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <a href="{{ route('admin.pengguna.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-xl bg-white hover:bg-slate-100 text-navy font-bold text-xs shadow-xs transition-colors">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>+ Tambah Pengguna</span>
+            </a>
+        </div>
+    </div>
+
     {{-- Ringkasan --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-5">
         <div class="stat-card" style="padding: 14px 16px;">
@@ -24,7 +49,7 @@
             <div class="stat-info"><div class="stat-count" style="font-size:1.25rem;">{{ $ringkasan['admin'] }}</div><div class="stat-label" style="font-size:0.71875rem;">Admin Pusat</div></div>
         </div>
         <div class="stat-card" style="padding: 14px 16px;">
-            <div class="stat-icon bg-emerald-100 text-emerald-600" style="width:40px;height:40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>
+            <div class="stat-icon bg-blue-50 text-brand-blue border border-blue-200" style="width:40px;height:40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>
             <div class="stat-info"><div class="stat-count" style="font-size:1.25rem;">{{ $ringkasan['cs'] }}</div><div class="stat-label" style="font-size:0.71875rem;">Akun CS Cabang</div></div>
         </div>
         <div class="stat-card" style="padding: 14px 16px;">
@@ -38,11 +63,11 @@
         <form method="GET" action="{{ route('admin.pengguna.index') }}" class="grid grid-cols-1 md:grid-cols-[1fr_200px_auto] gap-3 items-end">
             <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-bold text-slate-700">Cari Pengguna</label>
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Nama, username, email, atau cabang..." class="w-full h-10 px-3.5 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Nama, username, email, atau cabang..." class="w-full h-[2.625rem] px-3.5 border border-slate-300 rounded-xl text-xs font-semibold bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
             </div>
             <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-bold text-slate-700">Peran</label>
-                <select name="role" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                <select name="role" class="w-full h-[2.625rem] px-3 border border-slate-300 rounded-xl text-xs font-semibold bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     <option value="">-- Semua Peran --</option>
                     @foreach(\App\Enums\UserRole::cases() as $r)
                         <option value="{{ $r->value }}" {{ request('role') === $r->value ? 'selected' : '' }}>{{ $r->label() }}</option>
@@ -50,8 +75,8 @@
                 </select>
             </div>
             <div class="flex gap-2">
-                <button type="submit" class="h-10 px-4 rounded-xl bg-navy text-white text-xs font-bold hover:opacity-90 cursor-pointer">Terapkan</button>
-                <a href="{{ route('admin.pengguna.index') }}" class="h-10 px-4 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold hover:bg-slate-100 inline-flex items-center">Reset</a>
+                <button type="submit" class="h-[2.625rem] px-4 rounded-xl bg-brand-blue hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center justify-center">Terapkan</button>
+                <a href="{{ route('admin.pengguna.index') }}" class="h-[2.625rem] px-4 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold hover:bg-slate-100 inline-flex items-center justify-center">Reset</a>
             </div>
         </form>
     </div>
@@ -77,7 +102,7 @@
                             <tr class="{{ !$u->is_active ? 'opacity-60' : '' }}">
                                 <td>
                                     <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-gold to-amber-600 flex items-center justify-center text-white font-bold text-[0.75rem] shrink-0">{{ strtoupper(substr($u->name, 0, 2)) }}</div>
+                                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-blue to-navy text-white flex items-center justify-center font-bold text-[0.75rem] shrink-0 shadow-2xs">{{ strtoupper(substr($u->name, 0, 2)) }}</div>
                                         <div>
                                             <div class="font-bold text-slate-800">{{ $u->name }} @if($u->is(auth()->user()))<span class="text-[0.71875rem] bg-slate-100 border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded ml-1">Anda</span>@endif</div>
                                             <div class="text-[0.71875rem] text-slate-500">&#64;{{ $u->username }} &bull; {{ $u->email }}</div>
@@ -86,7 +111,7 @@
                                 </td>
                                 <td>
                                     @if($u->isSuperAdmin())
-                                        <span class="badge" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a;">Admin Utama</span>
+                                        <span class="badge" style="background:#eff6ff; color:#0066cc; border:1px solid #bfdbfe;">Admin Utama</span>
                                     @else
                                         <span class="badge {{ $u->isAdmin() ? 'badge-diproses' : 'badge-selesai' }}">{{ $u->labelRole() }}</span>
                                     @endif
@@ -115,7 +140,7 @@
                                     </div>
                                 </td>
                                 <td style="text-align:center; white-space:nowrap;">
-                                    <a href="{{ route('admin.pengguna.edit', $u) }}" class="btn btn-sm" style="padding:5px 11px; font-size:0.75rem; background:#fef3c7; color:#b45309; border:1px solid #fde68a;">Edit</a>
+                                    <a href="{{ route('admin.pengguna.edit', $u) }}" class="btn btn-sm" style="padding:5px 11px; font-size:0.75rem; background-color: #0066CC; color: #ffffff; border: 1px solid #0052a3; font-weight: 600;">Edit</a>
 
                                     @if(in_array($u->id, $sesiAktifUserIds ?? []) && ! $u->is(auth()->user()))
                                         <form action="{{ route('admin.pengguna.reset_sesi', $u) }}" method="POST" class="inline"
@@ -125,7 +150,7 @@
                                               data-aksi="Ya, Putus Sesi"
                                               data-pesan="Sesi aktif untuk {{ $u->name }} (@{{ $u->username }}) akan diputus. Pengguna tersebut (atau staf di komputer lain) dapat langsung login kembali ke sistem.">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm cursor-pointer" style="padding:5px 11px; font-size:0.75rem; margin-left:4px; background:#fed7aa; color:#9a3412; border:1px solid #fdba74;" title="Putus sesi aktif jika staf terkunci di perangkat lain">
+                                            <button type="submit" class="btn btn-secondary btn-sm cursor-pointer" style="padding:5px 11px; font-size:0.75rem; margin-left:4px;" title="Putus sesi aktif jika staf terkunci di perangkat lain">
                                                 Reset Sesi
                                             </button>
                                         </form>

@@ -45,11 +45,27 @@ class DashboardController extends Controller
         $totalKasus   = (clone $baseQuery)->count();
         $totalNominal = (float) (clone $baseQuery)->sum('nominal_transaksi');
 
-        // === 5. Agregasi Mesin ATM (existing behavior) ===
+        // === 5. Agregasi Mesin ATM (Murni Fisik ATM Bank Sulteng) ===
+        $nonAtmKeywords = ['BANK LAIN', 'MOBILE BANKING', 'MBANKING', 'SMS BANKING', 'EDC', 'QRIS', 'INTERNET BANKING', 'LAKU PANDAI', 'TAMASYA'];
+
         $atmQuery = (clone $baseQuery)
             ->whereNotNull('terminal_transaksi')
             ->where('terminal_transaksi', '!=', '')
             ->where('terminal_transaksi', '!=', '-');
+
+        foreach ($nonAtmKeywords as $kw) {
+            $atmQuery->where('terminal_transaksi', 'not like', "%{$kw}%");
+        }
+
+        $atmQuery->whereDoesntHave('masterTransaksi', function ($tQ) {
+            $tQ->where('channel', 'LIKE', '%ATM BERSAMA%')
+               ->orWhere('channel', 'LIKE', '%ATM LINK%')
+               ->orWhere('channel', 'LIKE', '%BANK LAIN%')
+               ->orWhere('channel', 'LIKE', '%MOBILE%')
+               ->orWhere('channel', 'LIKE', '%SMS%')
+               ->orWhere('channel', 'LIKE', '%QRIS%')
+               ->orWhere('channel', 'LIKE', '%EDC%');
+        });
 
         $atmGrouped = (clone $atmQuery)
             ->select('terminal_transaksi', DB::raw('COUNT(*) as total_keluhan'), DB::raw('SUM(nominal_transaksi) as total_nominal'))
@@ -64,7 +80,7 @@ class DashboardController extends Controller
 
         // === 6. Ringkasan Status ===
         $statusStats = [
-            'menunggu' => (clone $baseQuery)->where('status', 'Menunggu')->count(),
+            'menunggu' => (clone $baseQuery)->whereIn('status', ['Menunggu', 'Pending'])->count(),
             'success'  => (clone $baseQuery)->where('status', 'Success')->count(),
             'done'     => (clone $baseQuery)->where('status', 'Done')->count(),
             'rejected' => (clone $baseQuery)->where('status', 'Rejected')->count(),
@@ -175,7 +191,7 @@ class DashboardController extends Controller
         // === 14. Backlog Perlu Tindak Lanjut (Menunggu > 7 hari) ===
         $backlogThreshold = Carbon::now()->subDays(7)->format('Y-m-d');
         $pendingQ = Jurnal::with(['masterCabang', 'masterTransaksi'])
-            ->where('status', 'Menunggu')
+            ->whereIn('status', ['Menunggu', 'Pending'])
             ->whereNotNull('tgl_terima')
             ->where('tgl_terima', '<=', $backlogThreshold);
 

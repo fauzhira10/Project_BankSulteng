@@ -13,7 +13,7 @@
         </svg>
         <span>Ke Tabel Data Jurnal</span>
     </a>
-    <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 text-xs font-semibold shadow-sm transition-opacity">
+    <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-lg bg-brand-blue hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -53,7 +53,7 @@
     @endif
 
     @php
-        $isMenunggu = strtolower(trim($jurnal->status ?? '')) === 'menunggu';
+        $isMenunggu = in_array(strtolower(trim($jurnal->status ?? '')), ['menunggu', 'pending']);
     @endphp
 
     @if($isMenunggu)
@@ -64,8 +64,8 @@
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
         <div>
-            <h4 class="text-amber-800 font-bold text-sm">Status Masih Menunggu</h4>
-            <p class="text-amber-700 text-xs mt-0.5">Formulir keluhan nasabah belum dapat dicetak karena status saat ini masih <strong>Menunggu</strong>. Silakan perbarui status penyelesaian keluhan (misalnya menjadi <em>Done / Selesai</em>, <em>Success</em>, atau <em>Rejected</em>) agar formulir cetak dapat diterbitkan.</p>
+            <h4 class="text-amber-800 font-bold text-sm">Status Masih Pending</h4>
+            <p class="text-amber-700 text-xs mt-0.5">Formulir keluhan nasabah belum dapat dicetak karena status saat ini masih <strong>Pending</strong>. Silakan perbarui status penyelesaian keluhan (misalnya menjadi <em>Done</em>, <em>Success</em>, atau <em>Rejected</em>) agar formulir cetak dapat diterbitkan.</p>
         </div>
     </div>
     @endif
@@ -104,7 +104,7 @@
             @php
                 $statusClass = 'bg-slate-100 text-slate-700 border-slate-200';
                 $st = strtolower(trim($jurnal->status));
-                if($st === 'menunggu') $statusClass = 'bg-amber-50 text-amber-700 border-amber-200';
+                if(in_array($st, ['menunggu', 'pending'])) $statusClass = 'bg-amber-50 text-amber-700 border-amber-200';
                 if($st === 'success') $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
                 if($st === 'done') $statusClass = 'bg-blue-50 text-blue-700 border-blue-200';
                 if($st === 'rejected') $statusClass = 'bg-rose-50 text-rose-700 border-rose-200';
@@ -258,14 +258,14 @@
             
             <div class="flex items-center gap-2.5 flex-wrap">
                 @if($isMenunggu)
-                    <div class="inline-flex items-center gap-2 h-11 px-4 rounded-xl bg-amber-100/80 border border-amber-300 text-amber-900 text-xs font-semibold">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-amber-700">
+                    <div class="inline-flex items-center gap-2 h-11 px-4 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 text-xs font-semibold">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
-                        <span>Status Menunggu — Belum Dapat Dicetak 🔒</span>
+                        <span>Status Pending — Belum Dapat Dicetak 🔒</span>
                     </div>
-                    <a href="{{ route('jurnal.edit', $jurnal->id) }}" class="inline-flex items-center gap-1.5 h-11 px-5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md shadow-amber-600/20 transition-all hover:-translate-y-0.5">
+                    <a href="{{ route('jurnal.edit', $jurnal->id) }}" class="inline-flex items-center gap-1.5 h-11 px-5 rounded-xl bg-brand-blue hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-colors">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>

@@ -170,7 +170,11 @@ class LaporanController extends Controller
         }
 
         if (!empty($selectedStatus)) {
-            $query->where('status', $selectedStatus);
+            if (in_array($selectedStatus, ['Pending', 'Menunggu'], true)) {
+                $query->whereIn('status', ['Pending', 'Menunggu']);
+            } else {
+                $query->where('status', $selectedStatus);
+            }
         }
 
         $jurnals = $query->get();
@@ -266,7 +270,11 @@ class LaporanController extends Controller
             $query->where('master_cabang_id', $selectedCabang);
         }
         if (!empty($selectedStatus)) {
-            $query->where('status', $selectedStatus);
+            if (in_array($selectedStatus, ['Pending', 'Menunggu'], true)) {
+                $query->whereIn('status', ['Pending', 'Menunggu']);
+            } else {
+                $query->where('status', $selectedStatus);
+            }
         }
 
         $jurnals = $query->get();

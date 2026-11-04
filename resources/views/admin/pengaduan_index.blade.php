@@ -14,6 +14,25 @@
 @endphp
 <div class="max-w-[78.125rem] mx-auto">
 
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-navy-dark via-blue-900 to-sky-700 rounded-2xl p-6 text-white mb-6 shadow-md flex justify-between items-center flex-wrap gap-4">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5 m-0 mb-1.5">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                </svg>
+                <span>Pusat Pengaduan CS Cabang</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-white/85 m-0">Verifikasi berkas dan tindak lanjuti laporan pengaduan nasabah yang diajukan oleh Customer Service kantor cabang PT Bank Sulteng.</p>
+        </div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white">
+                Total Masuk: {{ number_format($pengaduans->total(), 0, ',', '.') }}
+            </span>
+        </div>
+    </div>
+
     {{-- Tab status --}}
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs mb-5 p-2 flex items-center gap-1.5 overflow-x-auto">
         @foreach($tabs as $t)
@@ -31,11 +50,11 @@
             <input type="hidden" name="status" value="{{ $statusAktif }}">
             <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-bold text-slate-700">Cari</label>
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Nomor, nama nasabah, rekening, resi, pelapor..." class="w-full h-10 px-3.5 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Nomor, nama nasabah, rekening, resi, pelapor..." class="w-full h-[2.625rem] px-3.5 border border-slate-300 rounded-xl text-xs font-semibold bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
             </div>
             <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-bold text-slate-700">Kantor Cabang</label>
-                <select name="master_cabang_id" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                <select name="master_cabang_id" class="w-full h-[2.625rem] px-3 border border-slate-300 rounded-xl text-xs font-semibold bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     <option value="">-- Semua Cabang --</option>
                     @foreach($cabangs as $c)
                         <option value="{{ $c->id }}" {{ request('master_cabang_id') == $c->id ? 'selected' : '' }}>{{ !empty($c->kode_cabang) && strtoupper(trim($c->nama_cabang)) !== 'CALL CENTER' ? $c->kode_cabang . ' - ' : '' }}{{ $c->nama_cabang }}</option>
@@ -44,7 +63,7 @@
             </div>
             <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-bold text-slate-700">Prioritas</label>
-                <select name="prioritas" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                <select name="prioritas" class="w-full h-[2.625rem] px-3 border border-slate-300 rounded-xl text-xs font-semibold bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     <option value="">-- Semua Prioritas --</option>
                     <option value="Tinggi" {{ request('prioritas') === 'Tinggi' ? 'selected' : '' }}>Tinggi (Maks. 2 Hari)</option>
                     <option value="Sedang" {{ request('prioritas') === 'Sedang' ? 'selected' : '' }}>Sedang (Maks. 5 Hari)</option>
@@ -53,7 +72,7 @@
             </div>
             <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-bold text-slate-700">Batas Waktu (SLA)</label>
-                <select name="sla" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                <select name="sla" class="w-full h-[2.625rem] px-3 border border-slate-300 rounded-xl text-xs font-semibold bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
                     <option value="">-- Semua Waktu --</option>
                     <option value="overdue" {{ request('sla') === 'overdue' ? 'selected' : '' }}>⚠️ Lewat Batas (Overdue)</option>
                     <option value="urgent" {{ request('sla') === 'urgent' ? 'selected' : '' }}>⏳ Mendekati Batas (≤ 2 Hari)</option>
@@ -61,11 +80,11 @@
             </div>
             <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-bold text-slate-700">Tanggal Kirim</label>
-                <input type="date" name="tgl_dari" value="{{ request('tgl_dari') }}" class="w-full h-10 px-3 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
+                <input type="date" name="tgl_dari" value="{{ request('tgl_dari') }}" class="w-full h-[2.625rem] px-3 border border-slate-300 rounded-xl text-xs font-semibold bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none">
             </div>
             <div class="flex gap-2">
-                <button type="submit" class="h-10 px-4 rounded-xl bg-navy text-white text-xs font-bold hover:opacity-90 cursor-pointer">Filter</button>
-                <a href="{{ route('admin.pengaduan.index', ['status' => $statusAktif]) }}" class="h-10 px-3.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold hover:bg-slate-100 inline-flex items-center">Reset</a>
+                <button type="submit" class="h-[2.625rem] px-4 rounded-xl bg-brand-blue hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center justify-center">Filter</button>
+                <a href="{{ route('admin.pengaduan.index', ['status' => $statusAktif]) }}" class="h-[2.625rem] px-3.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold hover:bg-slate-100 inline-flex items-center justify-center">Reset</a>
             </div>
         </form>
     </div>
@@ -151,7 +170,7 @@
                                         @if($p->jurnal)<div class="text-[0.71875rem] text-slate-500 mt-1">Jurnal #{{ $p->jurnal->id }} &bull; {{ $p->jurnal->status }}</div>@endif
                                     </td>
                                     <td style="text-align:center; white-space:nowrap;">
-                                        <a href="{{ route('admin.pengaduan.show', $p) }}" class="btn btn-sm" style="padding: 6px 12px; font-size: 0.75rem; background:#0b2f54; color:#fff; border:1px solid #0b2f54;">
+                                        <a href="{{ route('admin.pengaduan.show', $p) }}" class="btn btn-sm" style="padding: 6px 12px; font-size: 0.75rem; background-color: #0066CC; color: #ffffff; border: 1px solid #0052a3; font-weight: 600;">
                                             {{ $p->status === \App\Enums\PengaduanStatus::Terkirim ? 'Verifikasi' : 'Detail' }}
                                         </a>
                                     </td>

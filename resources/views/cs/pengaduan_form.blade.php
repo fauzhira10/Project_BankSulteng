@@ -282,7 +282,7 @@
                     <span class="text-[0.71875rem] text-slate-500">Dengan mengirim, Anda menyatakan data & lampiran sudah diverifikasi bersama nasabah.</span>
                     <div class="flex items-center gap-3">
                         <a href="{{ $edit ? route('cs.pengaduan.show', $pengaduan) : route('cs.pengaduan.index') }}" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200 transition-colors">Batal</a>
-                        <button type="submit" id="btnSubmit" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-gradient-to-r from-brand-blue to-navy text-white hover:opacity-95 hover:shadow-lg shadow-brand-blue/25 transition-all cursor-pointer">
+                        <button type="submit" id="btnSubmit" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[0.84375rem] font-semibold bg-brand-blue hover:bg-blue-700 text-white shadow-xs hover:shadow-sm transition-all cursor-pointer">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                             <span>{{ $edit ? 'Simpan Perubahan' : 'Kirim Pengaduan ke Pusat' }}</span>
                         </button>

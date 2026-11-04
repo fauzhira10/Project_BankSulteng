@@ -13,12 +13,12 @@
                 <line x1="6" y1="6" x2="6.01" y2="6"></line>
                 <line x1="6" y1="18" x2="6.01" y2="18"></line>
             </svg>
-            <span>Monitoring Keluhan Mesin ATM</span>
+            <span>Monitoring Mesin ATM Bank Sulteng</span>
         </h1>
-        <p class="text-xs sm:text-sm text-white/85 m-0">Identifikasi dan evaluasi unit mesin ATM / terminal yang paling sering mengalami kendala transaksi perbankan.</p>
+        <p class="text-xs sm:text-sm text-white/85 m-0">Identifikasi dan evaluasi keandalan unit fisik mesin ATM Bank Sulteng yang paling sering mengalami kendala transaksi.</p>
     </div>
     <div class="flex items-center gap-2.5 flex-wrap">
-        <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-amber-200">
+        <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white">
             Periode: {{ $selectedMonth ? $monthNames[$selectedMonth] . ' ' : '' }}{{ $selectedYear }}
         </span>
     </div>
@@ -32,9 +32,6 @@
                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
             </svg>
             <span>Parameter Filter Data Mesin ATM</span>
-        </div>
-        <div class="text-xs text-slate-500">
-            Pilih tahun, bulan, cabang, atau cari kode mesin spesifik
         </div>
     </div>
 
@@ -134,7 +131,7 @@
 
             <!-- Tombol Aksi -->
             <div class="flex items-center gap-2.5 h-[2.625rem]">
-                <button type="submit" class="h-[2.625rem] px-5 rounded-xl bg-gradient-to-r from-navy to-blue-700 hover:from-navy-dark hover:to-blue-800 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm shadow-navy/20 transition-all cursor-pointer">
+                <button type="submit" class="h-[2.625rem] px-5 rounded-xl bg-brand-blue hover:bg-blue-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -208,10 +205,12 @@
                                     <span class="text-slate-500 font-medium text-[0.8125rem]">Kode Mesin:</span>
                                     <span class="font-extrabold font-mono text-navy text-[0.90625rem] px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-300 tracking-wide shadow-2xs">{{ $atm['atm_info']['id_luno'] }}</span>
                                 </div>
-                            @elseif(str_contains(strtoupper($atm['terminal']), 'BANK LAIN'))
-                                <div class="text-[0.75rem] text-slate-500 mt-1 font-semibold">Kanal Transaksi Off-Us (ATM Bank Lain)</div>
-                            @elseif(str_contains(strtoupper($atm['terminal']), 'MOBILE BANKING') || str_contains(strtoupper($atm['terminal']), 'SMS BANKING'))
-                                <div class="text-[0.75rem] text-slate-500 mt-1 font-semibold">Kanal Layanan Perbankan Digital</div>
+                            @endif
+                            @if(!empty($atm['atm_info']['lokasi']))
+                                <div class="text-[0.75rem] text-slate-500 mt-1 font-semibold flex items-center gap-1">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    <span>{{ $atm['atm_info']['lokasi'] }}</span>
+                                </div>
                             @endif
                         </td>
 
@@ -648,19 +647,6 @@
                     filterTerminal.appendChild(optGroup);
                 }
             });
-
-            const generalGroup = document.createElement('optgroup');
-            generalGroup.label = 'Channel Non-ATM';
-            ['BANK LAIN', 'ATM BANK LAIN', 'MOBILE BANKING', 'SMS BANKING', 'EDC', 'EDC BANK LAIN'].forEach(ch => {
-                const opt = document.createElement('option');
-                opt.value = ch;
-                opt.textContent = ch;
-                if (targetValue && targetValue.toUpperCase().trim() === ch) {
-                    opt.selected = true;
-                }
-                generalGroup.appendChild(opt);
-            });
-            filterTerminal.appendChild(generalGroup);
         }
 
         if (targetValue && filterTerminal.selectedIndex <= 0) {

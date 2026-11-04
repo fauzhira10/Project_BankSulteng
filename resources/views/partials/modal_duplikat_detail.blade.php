@@ -261,7 +261,7 @@
         // Badge Status
         const st = (jurnal.status || '-').toLowerCase().trim();
         let badgeClass = 'badge-strip';
-        if (st === 'menunggu') badgeClass = 'badge-menunggu';
+        if (st === 'menunggu' || st === 'pending') badgeClass = 'badge-menunggu';
         else if (st === 'success') badgeClass = 'badge-success';
         else if (st === 'done') badgeClass = 'badge-done';
         else if (st === 'rejected') badgeClass = 'badge-rejected';

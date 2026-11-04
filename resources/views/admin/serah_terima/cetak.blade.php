@@ -65,7 +65,8 @@
         }
         .btn:hover { filter: brightness(1.08); transform: scale(1.02); }
         .btn-back  { background: #475569; color: #fff; }
-        .btn-print { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; box-shadow: 0 3px 10px rgba(37,99,235,.3); }
+        .btn-print { background: #0066cc; color: #fff; box-shadow: 0 2px 6px rgba(0,102,204,.25); }
+        .btn-print:hover { background: #0052a3; }
 
         /* ─── Kertas A4 ────────────────────────────────────────── */
         .sheet-a4 {

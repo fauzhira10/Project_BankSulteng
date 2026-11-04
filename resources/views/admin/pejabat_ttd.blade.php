@@ -7,14 +7,35 @@
 @section('content')
 <div class="max-w-[75rem] mx-auto">
 
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-navy-dark via-blue-900 to-sky-700 rounded-2xl p-6 text-white mb-6 shadow-md flex justify-between items-center flex-wrap gap-4">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5 m-0 mb-1.5">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                    <path d="M2 2l7.586 7.586"></path>
+                    <circle cx="11" cy="11" r="2"></circle>
+                </svg>
+                <span>Daftar Tanda Tangan Digital Pejabat</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-white/85 m-0">Pengaturan spesimen tanda tangan dan pejabat berwenang untuk 4 slot pengesahan dokumen formal PT Bank Sulteng.</p>
+        </div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white">
+                4 Slot Pengesahan Dokumen
+            </span>
+        </div>
+    </div>
+
     @if(session('success'))
-    <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-lg mb-6 shadow-sm flex items-start gap-3">
-        <svg class="text-emerald-500 mt-0.5 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="bg-blue-50 border-l-4 border-brand-blue p-4 rounded-r-lg mb-6 shadow-xs flex items-start gap-3">
+        <svg class="text-brand-blue mt-0.5 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </svg>
         <div>
-            <h4 class="text-emerald-800 font-bold text-sm">{{ session('success') }}</h4>
+            <h4 class="text-navy font-bold text-sm">{{ session('success') }}</h4>
         </div>
     </div>
     @endif
@@ -72,7 +93,7 @@
                                         <div class="flex items-center gap-2 flex-wrap mb-1">
                                             <span class="font-extrabold text-[0.875rem] text-navy tracking-tight">{{ $p->nama }}</span>
                                             @if($p->is_default)
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.6875rem] font-extrabold bg-emerald-500 text-white shadow-xs">
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[0.6875rem] font-extrabold bg-brand-blue text-white shadow-xs">
                                                     ★ UTAMA (DEFAULT)
                                                 </span>
                                             @else
@@ -112,18 +133,18 @@
                                         @if(!$p->is_default)
                                             <form action="{{ route('admin.pejabat-ttd.set_default', $p->id) }}" method="POST" class="inline">
                                                 @csrf
-                                                <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.71875rem] font-bold text-amber-800 bg-amber-50/80 hover:bg-amber-100 hover:text-amber-900 border border-amber-200/80 shadow-xs transition-all cursor-pointer group" title="Jadikan pejabat utama (default) untuk slot ini">
-                                                    <svg class="w-3.5 h-3.5 text-amber-500 fill-amber-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.71875rem] font-bold text-brand-blue bg-blue-50 hover:bg-brand-blue hover:text-white border border-blue-200/90 shadow-xs transition-all cursor-pointer group" title="Jadikan pejabat utama (default) untuk slot ini">
+                                                    <svg class="w-3.5 h-3.5 text-brand-blue fill-brand-blue/20 group-hover:fill-white group-hover:text-white group-hover:scale-110 transition-all" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                                                     </svg>
                                                     <span>Jadikan Utama</span>
                                                 </button>
                                             </form>
                                         @else
-                                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.71875rem] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-xs">
+                                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.71875rem] font-bold bg-blue-50 text-brand-blue border border-blue-200 shadow-xs">
                                                 <span class="flex h-2 w-2 relative">
-                                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-blue"></span>
                                                 </span>
                                                 <span>Pejabat Utama</span>
                                             </div>
@@ -183,10 +204,10 @@
             <input type="hidden" name="_method" id="formMethod" value="POST">
 
             {{-- Alert Khusus Pejabat Default Terkunci --}}
-            <div id="alertPejabatLocked" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200/90 text-amber-900 text-xs flex items-start gap-2.5 shadow-2xs">
+            <div id="alertPejabatLocked" class="hidden p-3.5 rounded-xl bg-blue-50/80 border border-blue-200 text-slate-700 text-xs flex items-start gap-2.5 shadow-2xs">
                 <span class="text-base shrink-0 mt-0.5 leading-none">🔒</span>
                 <div class="leading-relaxed">
-                    <strong class="font-bold">Nama & Jabatan Terkunci:</strong> Pejabat ini merupakan pejabat default sistem. Hanya berkas tanda tangan digital yang dapat diperbarui.
+                    <strong class="font-bold text-navy">Nama & Jabatan Terkunci:</strong> Pejabat ini merupakan pejabat default sistem. Hanya berkas tanda tangan digital yang dapat diperbarui.
                 </div>
             </div>
 
@@ -204,7 +225,7 @@
             <div>
                 <div class="flex items-center justify-between mb-1">
                     <label class="block text-xs font-bold text-slate-700">Nama Lengkap & Gelar Pejabat <span id="reqNama" class="text-rose-500">*</span></label>
-                    <span id="badgeLockedNama" class="hidden text-[0.6875rem] font-bold text-amber-700 bg-amber-100/90 border border-amber-300/80 px-2 py-0.5 rounded-md">🔒 Terkunci</span>
+                    <span id="badgeLockedNama" class="hidden text-[0.6875rem] font-bold text-brand-blue bg-blue-50 border border-blue-200/90 px-2 py-0.5 rounded-md">🔒 Terkunci</span>
                 </div>
                 <input type="text" name="nama" id="inputNama" required placeholder="Contoh: DIANA, ST atau H. AHMAD, SE" class="w-full h-10 px-3.5 border border-slate-300 rounded-xl text-sm uppercase bg-white focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 focus:outline-none font-medium transition-colors">
                 <p id="hintLockedNama" class="hidden text-[0.6875rem] text-slate-500 mt-1">Nama pejabat default sistem dilindungi dan tidak dapat diubah.</p>
@@ -214,7 +235,7 @@
             <div>
                 <div class="flex items-center justify-between mb-1">
                     <label class="block text-xs font-bold text-slate-700">Jabatan Resmi Pejabat <span id="reqJabatan" class="text-rose-500">*</span></label>
-                    <span id="badgeLockedJabatan" class="hidden text-[0.6875rem] font-bold text-amber-700 bg-amber-100/90 border border-amber-300/80 px-2 py-0.5 rounded-md">🔒 Terkunci</span>
+                    <span id="badgeLockedJabatan" class="hidden text-[0.6875rem] font-bold text-brand-blue bg-blue-50 border border-blue-200/90 px-2 py-0.5 rounded-md">🔒 Terkunci</span>
                 </div>
                 <input type="text" name="jabatan" id="inputJabatan" required placeholder="Contoh: Pemimpin Divisi IT atau Plt. Pemimpin Divisi IT" class="w-full h-10 px-3.5 border border-slate-300 rounded-xl text-sm bg-white focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 focus:outline-none transition-colors">
                 <p id="hintLockedJabatan" class="hidden text-[0.6875rem] text-slate-500 mt-1">Jabatan pejabat default sistem dilindungi dan tidak dapat diubah.</p>
@@ -244,8 +265,8 @@
 
                     {{-- Pratinjau Berkas Baru Terpilih --}}
                     <div id="previewNewUpload" class="hidden flex-col items-center gap-2 pt-1">
-                        <div class="text-[0.6875rem] font-bold text-emerald-700 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <div class="text-[0.6875rem] font-bold text-brand-blue flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 text-brand-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             Berkas TTD baru terpilih
                         </div>
                         <div style="width: 180px; height: 75px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin: auto;">
@@ -287,7 +308,7 @@
                 <button type="button" onclick="tutupModalPejabat()" class="px-4 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors shadow-2xs">
                     Batal
                 </button>
-                <button type="submit" id="btnSimpanPejabat" class="px-5 py-2 rounded-xl bg-gradient-to-r from-brand-blue to-navy text-white text-xs font-bold shadow-md hover:opacity-95 cursor-pointer transition-all">
+                <button type="submit" id="btnSimpanPejabat" class="px-5 py-2 rounded-xl bg-brand-blue hover:bg-blue-700 text-white text-xs font-bold shadow-xs cursor-pointer transition-colors">
                     Simpan Perubahan
                 </button>
             </div>

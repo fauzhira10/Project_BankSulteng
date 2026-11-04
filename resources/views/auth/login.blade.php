@@ -94,7 +94,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="w-full py-3 px-5 bg-gradient-to-r from-brand-blue to-navy text-white rounded-xl text-[0.9375rem] font-bold cursor-pointer shadow-lg shadow-brand-blue/30 hover:opacity-95 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand-blue/40 transition-all duration-200 flex items-center justify-center gap-2 mt-6.5">
+            <button type="submit" class="w-full py-3 px-5 bg-brand-blue hover:bg-blue-700 text-white rounded-xl text-[0.9375rem] font-bold cursor-pointer shadow-xs hover:shadow-sm transition-all duration-200 flex items-center justify-center gap-2 mt-6.5">
                 <span>Masuk ke Sistem</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>

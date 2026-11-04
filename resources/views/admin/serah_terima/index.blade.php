@@ -14,9 +14,9 @@
     from { transform: translateY(20px) translateX(-50%); opacity: 0; }
     to   { transform: translateY(0)    translateX(-50%); opacity: 1; }
 }
-@keyframes pulseGreen {
-    0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,.5); }
-    50%     { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+@keyframes pulseBlue {
+    0%,100% { box-shadow: 0 0 0 0 rgba(0, 102, 204, .5); }
+    50%     { box-shadow: 0 0 0 8px rgba(0, 102, 204, 0); }
 }
 
 #floatingSummary {
@@ -30,7 +30,7 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    background: linear-gradient(135deg, #0f2a5e 0%, #1a4090 100%);
+    background: #0b2f54;
     color: #fff;
     border-radius: 18px;
     padding: 14px 22px;
@@ -48,7 +48,7 @@
     pointer-events: auto;
 }
 #fsBadgeCount {
-    background: #10b981;
+    background: #0066cc;
     color: #fff;
     font-weight: 800;
     font-size: .88rem;
@@ -56,12 +56,12 @@
     border-radius: 999px;
     min-width: 36px;
     text-align: center;
-    animation: pulseGreen 2s ease-in-out infinite;
+    animation: pulseBlue 2s ease-in-out infinite;
 }
 #fsBadgeTotal {
     font-size: .98rem;
     font-weight: 800;
-    color: #6ee7b7;
+    color: #93c5fd;
     white-space: nowrap;
 }
 .fs-label { font-size: .8rem; color: rgba(255,255,255,.75); }
@@ -70,40 +70,39 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: #0066cc;
     color: #fff;
-    border: none;
+    border: 1px solid #0052a3;
     border-radius: 11px;
     padding: 10px 20px;
     font-size: .8rem;
     font-weight: 700;
     cursor: pointer;
-    transition: filter .17s, transform .15s;
+    transition: background-color .15s, transform .15s;
     white-space: nowrap;
-    box-shadow: 0 3px 12px rgba(16,185,129,.4);
+    box-shadow: 0 3px 12px rgba(0, 102, 204, .3);
 }
-.btn-cetak-float:hover { filter: brightness(1.1); transform: scale(1.03); }
+.btn-cetak-float:hover { background: #0052a3; transform: scale(1.02); }
 
 /* Tombol Aksi Header: Excel & Cetak */
 .btn-excel-head {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #059669;
-    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    background: #0066cc;
     color: #ffffff !important;
-    border: 1px solid #047857;
+    border: 1px solid #0052a3;
     border-radius: 12px;
     padding: 9px 18px;
     font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(5, 150, 105, 0.35);
+    box-shadow: 0 2px 6px rgba(0, 102, 204, 0.25);
     transition: all 0.2s ease;
 }
 .btn-excel-head:hover:not(:disabled) {
-    background: linear-gradient(135deg, #047857 0%, #059669 100%);
-    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.45);
+    background: #0052a3;
+    box-shadow: 0 4px 10px rgba(0, 102, 204, 0.35);
     transform: translateY(-1px);
 }
 .btn-excel-head:disabled {
@@ -119,21 +118,20 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #0f2a5e;
-    background: linear-gradient(135deg, #0f2a5e 0%, #1e40af 100%);
+    background: #0066cc;
     color: #ffffff !important;
-    border: 1px solid #1e3a8a;
+    border: 1px solid #0056b3;
     border-radius: 12px;
     padding: 9px 18px;
     font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(15, 42, 94, 0.35);
+    box-shadow: 0 2px 6px rgba(0, 102, 204, 0.25);
     transition: all 0.2s ease;
 }
 .btn-cetak-head:hover:not(:disabled) {
-    background: linear-gradient(135deg, #0b1f44 0%, #172554 100%);
-    box-shadow: 0 5px 15px rgba(15, 42, 94, 0.45);
+    background: #0052a3;
+    box-shadow: 0 4px 10px rgba(0, 102, 204, 0.35);
     transform: translateY(-1px);
 }
 .btn-cetak-head:disabled {
@@ -166,8 +164,9 @@
 .book-booked   { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
 
 .filter-inp {
+    height: 2.625rem;
     padding: .4rem .85rem;
-    border-radius: 10px;
+    border-radius: 0.75rem;
     border: 1.5px solid #e2e8f0;
     font-size: .8rem;
     transition: border-color .18s, box-shadow .18s;
@@ -183,8 +182,8 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 4px 11px;
-    border-radius: 7px;
+    padding: 5px 12px;
+    border-radius: 0.75rem;
     border: 1.5px solid #94a3b8;
     background: #fff;
     font-size: .71rem;
@@ -194,8 +193,8 @@
     transition: border-color .17s, background .17s, color .17s;
     white-space: nowrap;
 }
-#btnCheckAll:hover { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
-#btnCheckAll.all-checked { border-color: #10b981; background: #d1fae5; color: #065f46; }
+#btnCheckAll:hover { border-color: #0066cc; background: #eff6ff; color: #0066cc; }
+#btnCheckAll.all-checked { border-color: #0066cc; background: #eff6ff; color: #0066cc; }
 
 .tbl-serah thead th { position: sticky; top: 0; z-index: 4; }
 </style>
@@ -207,6 +206,28 @@
 @endphp
 <div class="max-w-[78.125rem] mx-auto space-y-5">
 
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-r from-navy-dark via-blue-900 to-sky-700 rounded-2xl p-6 text-white shadow-md flex justify-between items-center flex-wrap gap-4">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5 m-0 mb-1.5">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                    <line x1="9" y1="12" x2="15" y2="12"></line>
+                    <line x1="9" y1="16" x2="13" y2="16"></line>
+                    <polyline points="9 8 10 9 12 7"></polyline>
+                </svg>
+                <span>Lembar Serah Terima Pembukuan</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-white/85 m-0">Pilih tiket pengaduan yang telah diselesaikan untuk dicetak sebagai lembar serah terima pembukuan resmi dan diekspor ke Excel.</p>
+        </div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white">
+                Per Tanggal: {{ date('d/m/Y') }}
+            </span>
+        </div>
+    </div>
+
     {{-- === FORM + TABEL === --}}
     <form action="{{ route('admin.serah-terima.cetak') }}" method="POST" target="_blank" id="formSerahTerima">
         @csrf
@@ -217,7 +238,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="flex items-center gap-2">
-                            <label for="tanggal_serah_terima" class="text-xs font-bold text-slate-600 whitespace-nowrap">📅 Per Tanggal:</label>
+                            <label for="tanggal_serah_terima" class="text-xs font-bold text-slate-600 whitespace-nowrap">Per Tanggal:</label>
                             <input type="date" id="tanggal_serah_terima" name="tanggal_serah_terima" value="{{ date('Y-m-d') }}" class="filter-inp w-40">
                         </div>
                         <div class="hidden sm:block w-px h-5 bg-slate-200"></div>
@@ -233,13 +254,7 @@
                                 class="btn-excel-head"
                                 disabled>
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            <span>📗 Ekspor Excel Pembukuan (.xlsx)</span>
-                        </button>
-                        <button type="submit" id="btnCetakHeader"
-                                class="btn-cetak-head"
-                                disabled>
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                            <span>🖨️ Cetak Lembar Serah Terima</span>
+                            <span>Ekspor Excel Pembukuan (.xlsx)</span>
                         </button>
                     </div>
                 </div>
@@ -340,7 +355,7 @@
                             <td class="py-3 px-4 font-mono font-bold text-navy text-[0.7rem]">{{ $t->no_tiket ?: '—' }}</td>
                             <td class="py-3 px-4 font-semibold text-slate-800">{{ $t->nama_nasabah }}</td>
                             <td class="py-3 px-4 font-mono text-slate-600">{{ $t->no_rekening ?: '—' }}</td>
-                            <td class="py-3 px-4 text-right font-bold text-emerald-700 whitespace-nowrap">Rp {{ number_format($t->nominal_transaksi, 0, ',', '.') }}</td>
+                            <td class="py-3 px-4 text-right font-bold text-navy whitespace-nowrap">Rp {{ number_format($t->nominal_transaksi, 0, ',', '.') }}</td>
                             <td class="py-3 px-4 text-center">
                                 @if($sudahDibukukan)
                                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold book-booked"
@@ -394,7 +409,7 @@
     <button type="button" class="btn-cetak-float ml-2" id="btnCetakFloat"
             onclick="document.getElementById('formSerahTerima').submit()">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        🖨️ Cetak Lembar Serah Terima
+        <span>Cetak Lembar Serah Terima</span>
     </button>
 </div>
 @endsection

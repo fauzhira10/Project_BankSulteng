@@ -9,10 +9,10 @@
     $valid = $pemeriksaan['valid'];
     $awalanNol = str_repeat('0', $blok->tingkat_kesulitan);
     $warnaStatus = [
-        'utuh' => 'bg-emerald-100 text-emerald-700',
+        'utuh' => 'bg-blue-50 text-brand-blue border border-blue-200',
         'diubah' => 'bg-rose-500 text-white',
         'dihapus' => 'bg-rose-500 text-white',
-        'disisipkan' => 'bg-amber-500 text-white',
+        'disisipkan' => 'bg-rose-500 text-white',
     ];
 @endphp
 <div class="max-w-[80rem] mx-auto flex flex-col gap-5">
@@ -35,9 +35,9 @@
 
     {{-- Status --}}
     @if($valid)
-        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3">
-            <span class="w-9 h-9 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-extrabold shrink-0">✓</span>
-            <div class="text-[0.875rem] text-emerald-900"><strong>Blok valid.</strong> Tautan ke blok sebelumnya, proof of work, dan merkle root dari catatan audit saat ini semuanya cocok.</div>
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center gap-3">
+            <span class="w-9 h-9 rounded-lg bg-brand-blue text-white flex items-center justify-center font-extrabold shrink-0">✓</span>
+            <div class="text-[0.875rem] text-slate-800"><strong>Blok valid.</strong> Tautan ke blok sebelumnya, proof of work, dan merkle root dari catatan audit saat ini semuanya cocok.</div>
         </div>
     @else
         <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4">
@@ -66,7 +66,7 @@
                 </div>
                 <div class="px-5 py-2.5 grid sm:grid-cols-[11rem_1fr] gap-1">
                     <dt class="text-slate-500 font-semibold">Hash blok</dt>
-                    <dd class="font-mono text-[0.75rem] break-all"><span class="bg-emerald-200 text-emerald-900 font-bold">{{ $awalanNol }}</span><span class="text-navy font-bold">{{ substr($blok->hash_blok, $blok->tingkat_kesulitan) }}</span></dd>
+                    <dd class="font-mono text-[0.75rem] break-all"><span class="bg-blue-100 text-brand-blue font-bold px-1 rounded">{{ $awalanNol }}</span><span class="text-navy font-bold">{{ substr($blok->hash_blok, $blok->tingkat_kesulitan) }}</span></dd>
                 </div>
                 <div class="px-5 py-2.5 grid sm:grid-cols-[11rem_1fr] gap-1">
                     <dt class="text-slate-500 font-semibold">Hash blok sebelumnya</dt>
@@ -130,7 +130,7 @@
                 @endif
 
                 @if($jangkarAktif)
-                    <a href="{{ route('admin.blockchain.show', ['nomor' => $blok->nomor, 'cek' => 1]) }}" class="mt-auto inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-white bg-navy hover:bg-navy-light transition-colors">
+                    <a href="{{ route('admin.blockchain.show', ['nomor' => $blok->nomor, 'cek' => 1]) }}" class="mt-auto inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl text-[0.8125rem] font-bold text-white bg-brand-blue hover:bg-blue-700 transition-colors">
                         Cocokkan dengan Ethereum
                     </a>
                 @endif
@@ -138,8 +138,8 @@
                 @if($cekJangkar)
                     @switch($cekJangkar['status'])
                         @case('cocok')
-                            <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-lg p-3">
-                                <strong>✓ Cocok.</strong> Hash blok di server sama persis dengan yang tercatat di Ethereum. Blok ini belum pernah diubah sejak dijangkarkan.
+                            <div class="bg-blue-50 border border-blue-200 text-slate-800 rounded-lg p-3">
+                                <strong class="text-brand-blue">✓ Cocok.</strong> Hash blok di server sama persis dengan yang tercatat di Ethereum. Blok ini belum pernah diubah sejak dijangkarkan.
                             </div>
                             @break
                         @case('berbeda')
@@ -150,13 +150,13 @@
                             </div>
                             @break
                         @case('belum')
-                            <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-3">Blok ini belum tercatat di kontrak Ethereum.</div>
+                            <div class="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg p-3">Blok ini belum tercatat di kontrak Ethereum.</div>
                             @break
                         @case('nonaktif')
                             <div class="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg p-3">Penjangkaran Ethereum tidak aktif.</div>
                             @break
                         @default
-                            <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-3">{{ $cekJangkar['pesan'] ?? 'Gagal menghubungi Ethereum.' }}</div>
+                            <div class="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg p-3">{{ $cekJangkar['pesan'] ?? 'Gagal menghubungi Ethereum.' }}</div>
                     @endswitch
                 @endif
             </div>
@@ -175,7 +175,7 @@
                 @foreach(array_reverse($pohon) as $i => $tingkat)
                     <div class="flex justify-center gap-2">
                         @foreach($tingkat as $hash)
-                            <span class="font-mono text-[0.71875rem] px-2 py-1 rounded-md border {{ $i === 0 ? 'bg-navy text-white border-navy font-bold' : ($loop->parent->last ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-700') }}" title="{{ $hash }}">{{ substr($hash, 0, 8) }}</span>
+                            <span class="font-mono text-[0.71875rem] px-2 py-1 rounded-md border {{ $i === 0 ? 'bg-navy text-white border-navy font-bold' : ($loop->parent->last ? 'bg-blue-50 border-blue-200 text-brand-blue font-semibold' : 'bg-slate-50 border-slate-200 text-slate-700') }}" title="{{ $hash }}">{{ substr($hash, 0, 8) }}</span>
                         @endforeach
                     </div>
                 @endforeach
@@ -183,7 +183,7 @@
         </div>
         <div class="flex justify-center gap-4 mt-3 text-[0.71875rem] text-slate-500">
             <span><span class="inline-block w-2.5 h-2.5 rounded-sm bg-navy align-middle"></span> Merkle root</span>
-            <span><span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-200 align-middle"></span> Daun = hash catatan audit</span>
+            <span><span class="inline-block w-2.5 h-2.5 rounded-sm bg-blue-200 align-middle"></span> Daun = hash catatan audit</span>
         </div>
     </div>
     @endif
@@ -215,7 +215,7 @@
                                 <span class="text-slate-500">Hash tersegel di blok</span>
                                 <code class="font-mono break-all">{{ $t['daun'] ?? '— (tidak ada: disisipkan setelah ditambang)' }}</code>
                                 <span class="text-slate-500">Hash dari isi sekarang</span>
-                                <code class="font-mono break-all {{ $t['status'] === 'utuh' ? 'text-emerald-700' : 'text-rose-700 font-bold' }}">{{ $t['daun_aktual'] ?? '— (catatan sudah tidak ada)' }}</code>
+                                <code class="font-mono break-all {{ $t['status'] === 'utuh' ? 'text-brand-blue' : 'text-rose-700 font-bold' }}">{{ $t['daun_aktual'] ?? '— (catatan sudah tidak ada)' }}</code>
                             </div>
                             @if($t['bukti'] !== [] || $t['daun'])
                                 <div class="mt-1">
@@ -227,7 +227,7 @@
                                             </li>
                                         @endforeach
                                     </ol>
-                                    <div class="mt-1.5 {{ $t['bukti_sah'] ? 'text-emerald-700' : 'text-rose-700' }} font-bold">
+                                    <div class="mt-1.5 {{ $t['bukti_sah'] ? 'text-brand-blue' : 'text-rose-700' }} font-bold">
                                         {{ $t['bukti_sah'] ? '✓ Hash catatan ini, digabung dengan bukti di atas, menghasilkan merkle root blok — catatan terbukti termasuk dalam blok dan tidak berubah.' : '✗ Bukti tidak sampai ke merkle root — catatan ini tidak sama dengan yang disegel.' }}
                                     </div>
                                 </div>

@@ -2,9 +2,12 @@
      Pemakaian: @include('partials.status_combobox', ['nilai' => old('status', $jurnal->status ?? 'Menunggu')]) --}}
 @php
     $nilaiStatus = trim((string) ($nilai ?? ''));
+    if (strtolower($nilaiStatus) === 'menunggu') {
+        $nilaiStatus = 'Pending';
+    }
     $statusStandar = [
         '-'        => ['label' => '- (Belum Ditentukan)', 'kelas' => 'badge-strip',    'titik' => '#94a3b8'],
-        'Menunggu' => ['label' => 'Menunggu',             'kelas' => 'badge-menunggu', 'titik' => '#d97706'],
+        'Pending'  => ['label' => 'Pending',              'kelas' => 'badge-menunggu', 'titik' => '#d97706'],
         'Success'  => ['label' => 'Success',              'kelas' => 'badge-success',  'titik' => '#0284c7'],
         'Done'     => ['label' => 'Done',                 'kelas' => 'badge-done',     'titik' => '#059669'],
         'Rejected' => ['label' => 'Rejected',             'kelas' => 'badge-rejected', 'titik' => '#dc2626'],
@@ -14,9 +17,8 @@
 <div class="flex flex-col gap-1.5 relative" id="status_combobox">
     <div class="flex items-center justify-between">
         <label for="status_input" class="font-semibold text-[0.8125rem] text-slate-700 flex items-center gap-1">
-            Status Keluhan <span class="text-rose-600 font-bold">*</span>
+            Status Keluhan
         </label>
-        <span class="text-[0.71875rem] text-slate-500 font-normal">Ketik bebas / pilih daftar</span>
     </div>
 
     <div class="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:border-brand-blue focus-within:ring-3 focus-within:ring-brand-blue/15 transition-all duration-200" id="status_wrapper">
@@ -36,7 +38,7 @@
             aria-haspopup="listbox"
             aria-autocomplete="list"
             aria-controls="status_dropdown"
-            placeholder="Contoh: Menunggu Konfirmasi Bank Lain"
+            placeholder="Contoh: Pending konfirmasi bank lain"
             class="block w-full px-3 py-2.5 text-sm bg-white text-slate-800 placeholder-slate-400 border-0 focus:outline-none focus:ring-0"
         >
         <button
@@ -52,8 +54,6 @@
             </svg>
         </button>
     </div>
-
-    <span id="status_info" class="text-[0.71875rem] text-slate-500 leading-snug"></span>
 
     <div
         id="status_dropdown"
@@ -97,13 +97,13 @@
     const chevron = document.getElementById('status_chevron');
     const tombol = document.getElementById('status_toggle');
     const titik = document.getElementById('status_titik');
-    const info = document.getElementById('status_info');
     const kosong = document.getElementById('status_no_match');
     const daftar = Array.from((wadah || document).querySelectorAll('.status-item'));
     if (!wadah || !input) return;
 
     const warna = {
         '-': '#94a3b8',
+        'pending': '#d97706',
         'menunggu': '#d97706',
         'success': '#0284c7',
         'done': '#059669',
@@ -120,17 +120,6 @@
         const standar = Object.prototype.hasOwnProperty.call(warna, baku);
 
         titik.style.backgroundColor = standar ? warna[baku] : '#7c3aed';
-
-        if (input.value.trim() === '') {
-            info.textContent = 'Status wajib diisi.';
-            info.className = 'text-[0.71875rem] text-slate-500 leading-snug';
-        } else if (standar) {
-            info.textContent = 'Status standar. Ikut dihitung pada ringkasan statistik dan rekap laporan.';
-            info.className = 'text-[0.71875rem] text-slate-500 leading-snug';
-        } else {
-            info.textContent = 'Status kustom akan disimpan apa adanya, namun tidak ikut dihitung pada kartu ringkasan statistik.';
-            info.className = 'text-[0.71875rem] text-violet-700 leading-snug';
-        }
 
         daftar.forEach(item => {
             const cocok = nilaiBaku(item.dataset.value) === baku;

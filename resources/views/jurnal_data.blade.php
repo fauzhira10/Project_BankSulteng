@@ -43,11 +43,11 @@
     }
 
     .floating-scroll-arrow:hover {
-        background: #0284c7;
+        background: #0066CC;
         color: #ffffff;
-        border-color: #0284c7;
+        border-color: #0066CC;
         transform: translateY(-50%) scale(1.1);
-        box-shadow: 0 6px 22px rgba(2, 132, 199, 0.45), 0 2px 6px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 6px 22px rgba(0, 102, 204, 0.45), 0 2px 6px rgba(0, 0, 0, 0.12);
     }
 
     .floating-scroll-arrow:active {
@@ -147,6 +147,33 @@
 
 @section('content')
 
+<!-- Hero Header -->
+<div class="bg-gradient-to-r from-navy-dark via-blue-900 to-sky-700 rounded-2xl p-6 text-white mb-6 shadow-md flex justify-between items-center flex-wrap gap-4">
+    <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5 m-0 mb-1.5">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            <span>Master Data Jurnal Keluhan Nasabah</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-white/85 m-0">Pencarian komprehensif, saring data transaksi, pelacakan tiket, serta unduh rekap arsip keluhan nasabah PT Bank Sulteng.</p>
+    </div>
+    <div class="flex items-center gap-2.5 flex-wrap">
+        <span class="bg-white/15 border border-white/30 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white">
+            Total Arsip: {{ number_format($jurnals->total(), 0, ',', '.') }} Data
+        </span>
+        <a href="{{ route('jurnal.create') }}" class="inline-flex items-center gap-2 h-[2.375rem] px-3.5 rounded-xl bg-white hover:bg-slate-100 text-navy font-bold text-xs shadow-xs transition-colors">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>+ Input Jurnal Baru</span>
+        </a>
+    </div>
+</div>
+
 <!-- Card Filter & Pencarian Cerdas -->
 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs mb-6 overflow-hidden transition-all duration-200 hover:shadow-md">
     <!-- Header Card -->
@@ -162,7 +189,6 @@
                     <span>Pencarian & Filter Data Keluhan</span>
                     <span id="activeFilterBadgeCount" class="hidden text-[0.71875rem] font-bold px-2 py-0.5 rounded-full bg-brand-blue/10 text-brand-blue border border-brand-blue/20">0 filter aktif</span>
                 </h3>
-                <p class="text-xs text-slate-500 mt-0.5">Filter cepat berdasarkan kata kunci, kantor cabang, terminal mesin, status, atau periode transaksi</p>
             </div>
         </div>
 
@@ -288,7 +314,7 @@
                         <select id="filterStatus" name="status" class="w-full h-10.5 px-3.5 pr-9 text-xs font-semibold text-slate-800 bg-slate-50/80 border border-slate-200 rounded-xl appearance-none cursor-pointer focus:bg-white focus:border-brand-blue focus:ring-3 focus:ring-brand-blue/15 focus:outline-none transition-all">
                             <option value="">-- Semua Status --</option>
                             <option value="-" {{ request('status') === '-' ? 'selected' : '' }}>⚪ - (Belum Ditentukan)</option>
-                            <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>🟡 Menunggu</option>
+                            <option value="Pending" {{ in_array(request('status'), ['Pending', 'Menunggu']) ? 'selected' : '' }}>🟡 Pending</option>
                             <option value="Success" {{ request('status') == 'Success' ? 'selected' : '' }}>🔵 Success</option>
                             <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>🟢 Done</option>
                             <option value="Rejected" {{ request('status') == 'Rejected' ? 'selected' : '' }}>🔴 Rejected</option>
@@ -339,18 +365,18 @@
                     </div>
 
                     <!-- 5. Filter Keluhan Berulang (Nama Nasabah + No. Resi sama lebih dari sekali) -->
-                    <label for="filterDuplikat" class="mt-2.5 flex items-center gap-2.5 px-3.5 py-2.5 bg-amber-50 border border-amber-200 rounded-xl cursor-pointer hover:bg-amber-100 transition-colors">
+                    <label for="filterDuplikat" class="mt-2.5 flex items-center gap-2.5 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50/50 hover:border-brand-blue/40 transition-all">
                         <input
                             type="checkbox"
                             id="filterDuplikat"
                             name="duplikat"
                             value="1"
                             {{ request()->boolean('duplikat') ? 'checked' : '' }}
-                            class="w-4 h-4 accent-amber-500 cursor-pointer"
+                            class="w-4 h-4 accent-brand-blue cursor-pointer rounded"
                         >
-                        <span class="text-xs font-bold text-amber-900 leading-snug">
+                        <span class="text-xs font-bold text-navy leading-snug">
                             Cek data berulang
-                            <span class="block text-[0.71875rem] font-semibold text-amber-700">Nama nasabah &amp; No. Resi yang sama tercatat lebih dari sekali</span>
+                            <span class="block text-[0.71875rem] font-normal text-slate-500">Nama nasabah &amp; No. Resi yang sama tercatat lebih dari sekali</span>
                         </span>
                     </label>
                 </div>
@@ -561,7 +587,7 @@
                                     @php
                                         $st = strtolower(trim($jurnal->status ?? '-'));
                                         $statusClass = match($st) {
-                                            'menunggu' => 'badge-menunggu',
+                                            'menunggu', 'pending' => 'badge-menunggu',
                                             'success' => 'badge-success',
                                             'done' => 'badge-done',
                                             'rejected' => 'badge-rejected',
@@ -574,7 +600,7 @@
                                 </td>
                                 <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
                                     @php
-                                        $isMenunggu = strtolower(trim($jurnal->status ?? '')) === 'menunggu';
+                                        $isMenunggu = in_array(strtolower(trim($jurnal->status ?? '')), ['menunggu', 'pending']);
                                         $hasLog = !empty($jurnal->keterangan_log) && trim($jurnal->keterangan_log) !== '-' && trim($jurnal->keterangan_log) !== '' && trim(strtolower($jurnal->keterangan_log)) !== 'tidak ada keterangan tambahan.';
                                     @endphp
                                     {{-- data-detail-id dipakai pramuat: rinciannya mulai diambil begitu
@@ -588,15 +614,15 @@
                                         <span>Detail</span>
                                     </button>
                                     @if($isMenunggu)
-                                        <button type="button" onclick="showMenungguWarning({{ json_encode($jurnal->bekalTombol()) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fef3c7; color: #92400e; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px solid #fde68a; cursor: pointer;" title="Status keluhan masih Menunggu. Ubah status penanganan terlebih dahulu untuk dapat mencetak.">
+                                        <button type="button" onclick="showMenungguWarning({{ json_encode($jurnal->bekalTombol()) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #f1f5f9; color: #475569; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px solid #cbd5e1; cursor: pointer;" title="Status keluhan masih Pending. Ubah status penanganan terlebih dahulu untuk dapat mencetak.">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                             </svg>
-                                            <span>Menunggu 🔒</span>
+                                            <span>Pending 🔒</span>
                                         </button>
                                     @elseif($hasLog)
-                                        <button type="button" onclick="openPrintChoiceModal({{ json_encode($jurnal->bekalTombol()) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
+                                        <button type="button" onclick="openPrintChoiceModal({{ json_encode($jurnal->bekalTombol()) }})" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #0066CC; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0052a3; cursor: pointer;" title="Pilih Format Cetak Dokumen">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                                                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -605,12 +631,12 @@
                                             <span>Cetak ▾</span>
                                         </button>
                                     @else
-                                        <button type="button" onclick="openQuickLogModal({{ json_encode($jurnal->bekalTombol()) }}, true)" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #fff7ed; color: #c2410c; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px dashed #ea580c; cursor: pointer;" title="Keterangan log masih kosong. Klik untuk mengisi log & mencetak.">
+                                        <button type="button" onclick="openQuickLogModal({{ json_encode($jurnal->bekalTombol()) }}, true)" class="btn btn-sm btn-cetak-action" data-jurnal-id="{{ $jurnal->id }}" style="background-color: #eff6ff; color: #0066CC; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px dashed #60a5fa; cursor: pointer;" title="Keterangan log masih kosong. Klik untuk mengisi log & mencetak.">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                             </svg>
-                                            <span>Log Kosong 🔒</span>
+                                            <span>Log Kosong </span>
                                         </button>
                                     @endif
                                 </td>
@@ -865,7 +891,7 @@
         </div>
 
         <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--bs-gray-200); display: flex; justify-content: flex-end; align-items: center; gap: 10px; background: var(--bs-gray-50); flex-wrap: wrap;">
-            <a id="modalBtnEdit" href="#" class="btn btn-warning" style="background-color: #f59e0b; color: #ffffff; border: 1px solid #d97706; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 18px; border-radius: 6px;">
+            <a id="modalBtnEdit" href="#" class="btn" style="background-color: #0066CC; color: #ffffff; border: 1px solid #0052a3; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 18px; border-radius: 6px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -887,10 +913,10 @@
 
 <!-- Modal Pop-Up Pilihan Format Cetak Dokumen (Penyelesaian / Penolakan) -->
 <div class="modal-backdrop" id="printChoiceModal" style="z-index: 1250;">
-    <div class="modal-content" style="max-width: 580px; border-top: 4px solid #0284c7; animation: modalFadeIn 0.2s ease-out;">
-        <div class="modal-header" style="background-color: #f0f9ff; border-bottom: 1px solid #e0f2fe;">
-            <h3 style="color: #0369a1; display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="modal-content" style="max-width: 580px; border-top: 4px solid #0066CC; animation: modalFadeIn 0.2s ease-out;">
+        <div class="modal-header" style="background-color: #f0f7ff; border-bottom: 1px solid #dbeafe;">
+            <h3 style="color: #0066CC; display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
                     <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                     <rect x="6" y="14" width="12" height="8"></rect>
@@ -910,7 +936,7 @@
             <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.75rem;">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
                     <div><span style="color: #64748b;">Nasabah:</span> <strong id="printChoiceNasabah" style="color: #0f172a;">-</strong></div>
-                    <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="printChoiceNoResi" style="color: #0284c7;">-</strong></div>
+                    <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="printChoiceNoResi" style="color: #0066CC;">-</strong></div>
                     <div><span style="color: #64748b;">Nominal:</span> <strong id="printChoiceNominal" style="color: #059669;">-</strong></div>
                     <div><span style="color: #64748b;">Channel:</span> <strong id="printChoiceChannel" style="color: #0f172a;">-</strong></div>
                 </div>
@@ -971,12 +997,12 @@
     </div>
 </div>
 
-<!-- Modal Pop-Up Peringatan Status Menunggu Belum Dapat Dicetak -->
+<!-- Modal Pop-Up Peringatan Status Pending Belum Dapat Dicetak -->
 <div class="modal-backdrop" id="menungguWarningModal" style="z-index: 1300;">
-    <div class="modal-content" style="max-width: 500px; border-top: 4px solid #f59e0b; animation: modalFadeIn 0.2s ease-out;">
-        <div class="modal-header" style="background-color: #fffbeb; border-bottom: 1px solid #fef3c7;">
-            <h3 style="color: #b45309; display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="modal-content" style="max-width: 500px; border-top: 4px solid #0066CC; animation: modalFadeIn 0.2s ease-out;">
+        <div class="modal-header" style="background-color: #f0f7ff; border-bottom: 1px solid #bae6fd;">
+            <h3 style="color: #0B2F64; display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -994,29 +1020,29 @@
         <div class="modal-body" style="padding: 20px 24px;">
             <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.75rem;">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
-                    <div><span style="color: #64748b;">No. Tiket:</span> <strong id="menungguTiket" style="color: #0369a1;">-</strong></div>
+                    <div><span style="color: #64748b;">No. Tiket:</span> <strong id="menungguTiket" style="color: #0066CC;">-</strong></div>
                     <div><span style="color: #64748b;">Nasabah:</span> <strong id="menungguNama" style="color: #0f172a;">-</strong></div>
-                    <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="menungguResi" style="color: #0284c7;">-</strong></div>
-                    <div><span style="color: #64748b;">Status:</span> <span class="badge badge-menunggu" style="font-size: 0.6875rem; padding: 2px 8px;">MENUNGGU</span></div>
+                    <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="menungguResi" style="color: #0066CC;">-</strong></div>
+                    <div><span style="color: #64748b;">Status:</span> <span class="badge badge-menunggu" style="font-size: 0.6875rem; padding: 2px 8px;">PENDING</span></div>
                 </div>
             </div>
 
             <div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px;">
-                <div style="width: 38px; height: 38px; border-radius: 8px; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+                <div style="width: 38px; height: 38px; border-radius: 8px; background: #eff6ff; color: #0066CC; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
                     🔒
                 </div>
                 <div>
                     <div style="font-size: 0.84375rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
-                        Status Penanganan Masih Menunggu
+                        Status Penanganan Masih Pending
                     </div>
                     <p style="font-size: 0.75rem; color: #475569; line-height: 1.5; margin: 0;">
-                        Formulir penyelesaian keluhan atau penolakan klaim nasabah belum dapat dicetak karena status saat ini masih <strong>Menunggu</strong>.
+                        Formulir penyelesaian keluhan atau penolakan klaim nasabah belum dapat dicetak karena status saat ini masih <strong>Pending</strong>.
                     </p>
                 </div>
             </div>
 
-            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px; font-size: 0.71875rem; color: #92400e; line-height: 1.45;">
-                💡 <strong>Petunjuk:</strong> Selesaikan hasil investigasi transaksi, lalu ubah status keluhan menjadi <strong>Selesai (Done / Success)</strong> atau <strong>Ditolak (Rejected)</strong> untuk mengaktifkan formulir cetak resmi.
+            <div style="background: #f0f7ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 10px 12px; font-size: 0.71875rem; color: #0B2F64; line-height: 1.45;">
+                💡 <strong>Petunjuk:</strong> Selesaikan hasil investigasi transaksi, lalu ubah status keluhan menjadi <strong>Done / Success</strong> atau <strong>Rejected</strong> untuk mengaktifkan formulir cetak resmi.
             </div>
         </div>
 
@@ -1024,7 +1050,7 @@
             <button type="button" class="btn btn-secondary" onclick="closeMenungguWarningModal()" style="font-size: 0.75rem;">
                 Tutup
             </button>
-            <a id="menungguBtnEdit" href="#" class="btn btn-warning" style="background-color: #f59e0b; color: #ffffff; border: 1px solid #d97706; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 7px 16px; border-radius: 6px; font-size: 0.75rem;">
+            <a id="menungguBtnEdit" href="#" class="btn" style="background-color: #0066CC; color: #ffffff; border: 1px solid #0052a3; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 7px 16px; border-radius: 6px; font-size: 0.75rem;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -1037,10 +1063,10 @@
 
 <!-- Modal Pop-Up Cepat Isi Keterangan Log (Quick Log Modal) -->
 <div class="modal-backdrop" id="quickLogModal" style="z-index: 1200;">
-    <div class="modal-content" style="max-width: 580px; border-top: 4px solid #ea580c; animation: modalFadeIn 0.2s ease-out;">
-        <div class="modal-header" style="background-color: #fff7ed; border-bottom: 1px solid #ffedd5;">
-            <h3 style="color: #c2410c; display: flex; align-items: center; gap: 8px; font-size: 0.96875rem; font-weight: 700;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="modal-content" style="max-width: 580px; border-top: 4px solid #0066CC; animation: modalFadeIn 0.2s ease-out;">
+        <div class="modal-header" style="background-color: #f0f7ff; border-bottom: 1px solid #bae6fd;">
+            <h3 style="color: #0B2F64; display: flex; align-items: center; gap: 8px; font-size: 0.96875rem; font-weight: 700;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
                     <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -1062,14 +1088,14 @@
             <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.75rem;">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
                     <div><span style="color: #64748b;">Nasabah:</span> <strong id="quickLogNasabah" style="color: #0f172a;">-</strong></div>
-                    <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="quickLogNoResi" style="color: #0284c7;">-</strong></div>
+                    <div><span style="color: #64748b;">No. Resi/Trace:</span> <strong id="quickLogNoResi" style="color: #0066CC;">-</strong></div>
                     <div><span style="color: #64748b;">Nominal:</span> <strong id="quickLogNominal" style="color: #059669;">-</strong></div>
                     <div><span style="color: #64748b;">Terminal/Channel:</span> <strong id="quickLogTerminal" style="color: #0f172a;">-</strong></div>
                 </div>
             </div>
 
-            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.71875rem; color: #92400e; display: flex; align-items: flex-start; gap: 8px; line-height: 1.45;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
+            <div style="background: #f0f7ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.71875rem; color: #0B2F64; display: flex; align-items: flex-start; gap: 8px; line-height: 1.45;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -1096,7 +1122,7 @@
                 <span>Batal</span>
             </button>
             <div style="display: flex; align-items: center; gap: 8px;">
-                <button type="button" id="btnSaveQuickLogOnly" onclick="saveQuickLog(false)" class="btn" style="background-color: #0284c7; color: #ffffff; border: 1px solid #0369a1; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px; cursor: pointer;">
+                <button type="button" id="btnSaveQuickLogOnly" onclick="saveQuickLog(false)" class="btn" style="background-color: #0066CC; color: #ffffff; border: 1px solid #0052a3; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px; cursor: pointer;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                         <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -1104,7 +1130,7 @@
                     </svg>
                     <span>Simpan Log</span>
                 </button>
-                <button type="button" id="btnSaveQuickLogAndPrint" onclick="saveQuickLog(true)" class="btn" style="background-color: #059669; color: #ffffff; border: 1px solid #047857; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px; cursor: pointer;">
+                <button type="button" id="btnSaveQuickLogAndPrint" onclick="saveQuickLog(true)" class="btn" style="background-color: #0066CC; color: #ffffff; border: 1px solid #0052a3; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px; cursor: pointer;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 6 2 18 2 18 9"></polyline>
                         <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -1179,10 +1205,10 @@
 
 <!-- Modal Import Excel Master -->
 <div class="modal-backdrop" id="importModal">
-    <div class="modal-content" style="max-width: 580px; border-top: 4px solid #0284c7;">
-        <div class="modal-header" style="background-color: #f0f9ff; border-bottom: 1px solid #bae6fd;">
-            <h3 style="color: #0369a1; display: flex; align-items: center; gap: 8px;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="modal-content" style="max-width: 580px; border-top: 4px solid #0066CC;">
+        <div class="modal-header" style="background-color: #f0f7ff; border-bottom: 1px solid #dbeafe;">
+            <h3 style="color: #0066CC; display: flex; align-items: center; gap: 8px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="17 8 12 3 7 8"></polyline>
                     <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -1205,14 +1231,14 @@
                 </p>
 
                 <!-- Drag & Drop Upload Zone -->
-                <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('fileExcelInput').click()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('fileExcelInput').click()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 10px auto; display: block;">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
                         <line x1="12" y1="18" x2="12" y2="12"></line>
                         <line x1="9" y1="15" x2="15" y2="15"></line>
                     </svg>
-                    <div id="dropzoneText" style="font-weight: 700; color: #0369a1; font-size: 0.875rem;">Klik untuk memilih file Excel atau seret file ke sini</div>
+                    <div id="dropzoneText" style="font-weight: 700; color: #0066CC; font-size: 0.875rem;">Klik untuk memilih file Excel atau seret file ke sini</div>
                     <div style="font-size: 0.75rem; color: var(--bs-gray-500); margin-top: 4px;">Mendukung format: .xlsx, .xls, .csv (Maks. 50MB)</div>
                     <div id="selectedFileName" style="display: none; margin-top: 10px; font-weight: 700; color: #047857; background: #ecfdf5; padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid #a7f3d0; font-size: 0.8125rem;"></div>
                 </div>
@@ -1227,22 +1253,17 @@
                     </label>
                 </div>
 
-                <!-- Info Box -->
-                <div id="tipsInfoBox" style="margin-top: 14px; font-size: 0.75rem; color: #0369a1; background-color: #f0f9ff; border-left: 3px solid #0284c7; padding: 10px 12px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
-                    💡 <strong>Tips Cerdas:</strong> Awalan angka nol pada Nomor Rekening, Nomor Kartu, dan Kode Cabang akan tetap dipertahankan. Data yang sudah pernah dimasukkan akan diperbarui secara otomatis tanpa menimbulkan duplikat.
-                </div>
-
                 <!-- Live Real-Time Progress Wrapper (Hidden by default) -->
                 <div id="importProgressBarWrapper" style="display: none; margin-top: 18px;">
                     <!-- Status & Percentage -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span id="importProgressText" style="font-size: 0.8125rem; font-weight: 700; color: #0369a1;">Mengunggah berkas Excel ke server...</span>
-                        <span id="importProgressPercent" style="font-size: 0.875rem; font-weight: 800; color: #0284c7;">0%</span>
+                        <span id="importProgressText" style="font-size: 0.8125rem; font-weight: 700; color: #0066CC;">Mengunggah berkas Excel ke server...</span>
+                        <span id="importProgressPercent" style="font-size: 0.875rem; font-weight: 800; color: #0066CC;">0%</span>
                     </div>
 
                     <!-- Progress Bar Track -->
                     <div style="width: 100%; height: 10px; background-color: #e2e8f0; border-radius: 5px; overflow: hidden;">
-                        <div id="importProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #0284c7, #059669); transition: width 0.3s ease; border-radius: 5px;"></div>
+                        <div id="importProgressBar" style="width: 0%; height: 100%; background: #0066CC; transition: width 0.3s ease; border-radius: 5px;"></div>
                     </div>
 
                     <!-- Live Step-by-Step Tracker -->
@@ -1271,7 +1292,7 @@
                 <button type="button" class="btn btn-secondary" onclick="closeImportModal()" id="btnCancelImport">
                     <span>Batal</span>
                 </button>
-                <button type="submit" class="btn" id="btnSubmitImport" style="background-color: #0284c7; color: #ffffff; border: 1px solid #0369a1; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                <button type="submit" class="btn" id="btnSubmitImport" style="background-color: #0066CC; color: #ffffff; border: 1px solid #0052a3; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
@@ -1286,7 +1307,7 @@
 
 <!-- Modal Sukses Import (Custom UI Feedback) -->
 <div class="modal-backdrop" id="importSuccessModal">
-    <div class="modal-content" style="max-width: 520px; text-align: center; border-top: 4px solid #059669; animation: modalFadeIn 0.25s ease-out;">
+    <div class="modal-content" style="max-width: 520px; text-align: center; border-top: 4px solid #0066CC; animation: modalFadeIn 0.25s ease-out;">
         <div class="modal-body" style="padding: 30px 24px 20px;">
             <div class="modal-icon-wrapper modal-icon-success">
                 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1302,7 +1323,7 @@
             <!-- Stat Summary Cards -->
             <div class="stat-result-grid">
                 <div class="stat-result-card card-total">
-                    <div class="stat-result-val" id="resTotalCount" style="color: #0284c7;">0</div>
+                    <div class="stat-result-val" id="resTotalCount" style="color: #0066CC;">0</div>
                     <div class="stat-result-lbl">Total Dibaca</div>
                 </div>
                 <div class="stat-result-card card-new">
@@ -1323,13 +1344,13 @@
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--bs-gray-500);">Status Template:</span>
-                    <strong style="color: #059669;">✓ Aktif Sebagai Master Template</strong>
+                    <strong style="color: #0066CC;">✓ Aktif Sebagai Master Template</strong>
                 </div>
             </div>
         </div>
 
         <div class="modal-footer" style="background-color: #fafafa; border-top: 1px solid var(--bs-gray-200); padding: 16px 24px; display: flex; justify-content: center;">
-            <button type="button" class="btn" onclick="closeImportSuccessModal()" style="background-color: #059669; color: #ffffff; min-width: 180px; padding: 10px 20px; font-weight: 700; border: none; border-radius: var(--radius-md); box-shadow: 0 2px 4px rgba(5, 150, 105, 0.25); cursor: pointer;">
+            <button type="button" class="btn" onclick="closeImportSuccessModal()" style="background-color: #0066CC; color: #ffffff; min-width: 180px; padding: 10px 20px; font-weight: 700; border: 1px solid #0052a3; border-radius: var(--radius-md); box-shadow: 0 2px 4px rgba(0, 102, 204, 0.25); cursor: pointer;">
                 Lihat Data di Tabel
             </button>
         </div>
@@ -1358,7 +1379,7 @@
             <button type="button" class="btn btn-secondary" onclick="closeImportErrorModal()">
                 Tutup
             </button>
-            <button type="button" class="btn" onclick="retryImport()" style="background-color: #0284c7; color: #ffffff; font-weight: 600; border: none; cursor: pointer;">
+            <button type="button" class="btn" onclick="retryImport()" style="background-color: #0066CC; color: #ffffff; font-weight: 600; border: 1px solid #0052a3; cursor: pointer;">
                 Coba Lagi
             </button>
         </div>
@@ -1433,10 +1454,10 @@
 
 <!-- Modal Proses Export Excel (Live Real-Time UI Progress) -->
 <div class="modal-backdrop" id="exportProgressModal">
-    <div class="modal-content" style="max-width: 520px; border-top: 4px solid #059669; animation: modalFadeIn 0.25s ease-out;">
-        <div class="modal-header" style="background-color: #f0fdf4; border-bottom: 1px solid #bbf7d0;">
-            <h3 style="color: #065f46; display: flex; align-items: center; gap: 8px; font-size: 1.0625rem; font-weight: 700;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="modal-content" style="max-width: 520px; border-top: 4px solid #0066CC; animation: modalFadeIn 0.25s ease-out;">
+        <div class="modal-header" style="background-color: #f0f7ff; border-bottom: 1px solid #bae6fd;">
+            <h3 style="color: #0B2F64; display: flex; align-items: center; gap: 8px; font-size: 1.0625rem; font-weight: 700;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -1448,8 +1469,8 @@
         <div class="modal-body" style="padding: 24px;">
             <!-- Animated Icon / Spinner -->
             <div style="text-align: center; margin-bottom: 18px;">
-                <div id="exportIconWrapper" style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: #ecfdf5; border: 2px solid #a7f3d0; margin-bottom: 12px;">
-                    <svg id="exportSpinnerSvg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;">
+                <div id="exportIconWrapper" style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: #eff6ff; border: 2px solid #bfdbfe; margin-bottom: 12px;">
+                    <svg id="exportSpinnerSvg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;">
                         <line x1="12" y1="2" x2="12" y2="6"></line>
                         <line x1="12" y1="18" x2="12" y2="22"></line>
                         <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
@@ -1459,7 +1480,7 @@
                         <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
                         <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
                     </svg>
-                    <svg id="exportSuccessCheckSvg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                    <svg id="exportSuccessCheckSvg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0066CC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                 </div>
@@ -1469,13 +1490,13 @@
 
             <!-- Status & Percentage -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span id="exportProgressText" style="font-size: 0.8125rem; font-weight: 700; color: #065f46;">Proses ekspor sedang berjalan...</span>
-                <span id="exportProgressPercent" style="font-size: 0.875rem; font-weight: 800; color: #059669;">25%</span>
+                <span id="exportProgressText" style="font-size: 0.8125rem; font-weight: 700; color: #0B2F64;">Proses ekspor sedang berjalan...</span>
+                <span id="exportProgressPercent" style="font-size: 0.875rem; font-weight: 800; color: #0066CC;">25%</span>
             </div>
 
             <!-- Progress Bar Track -->
             <div style="width: 100%; height: 10px; background-color: #e2e8f0; border-radius: 5px; overflow: hidden; margin-bottom: 20px;">
-                <div id="exportProgressBar" style="width: 25%; height: 100%; background: linear-gradient(90deg, #059669, #10b981); transition: width 0.25s ease; border-radius: 5px;"></div>
+                <div id="exportProgressBar" style="width: 25%; height: 100%; background: #0066CC; transition: width 0.25s ease; border-radius: 5px;"></div>
             </div>
 
             <!-- Step Tracker -->
@@ -1486,11 +1507,11 @@
                 </div>
                 <div class="import-step-item" id="expStep2">
                     <div class="import-step-badge" id="expStepBadge2">2</div>
-                    <span>Menyusun lembar data master (Sheet DATA_KELUHAN)</span>
+                    <span>Menyusun lembar data master keluhan</span>
                 </div>
                 <div class="import-step-item" id="expStep3">
                     <div class="import-step-badge" id="expStepBadge3">3</div>
-                    <span>Menghubungkan formula dinamis Slip Jurnal & Rekapitulasi Cabang</span>
+                    <span>Memformat tata letak & gaya perbankan</span>
                 </div>
                 <div class="import-step-item" id="expStep4">
                     <div class="import-step-badge" id="expStepBadge4">4</div>
@@ -2170,7 +2191,7 @@
         
         const rawSt = (jurnal.status || '-').toLowerCase().trim();
         let statusBadgeClass = 'badge-strip';
-        if (rawSt === 'menunggu') statusBadgeClass = 'badge-menunggu';
+        if (rawSt === 'menunggu' || rawSt === 'pending') statusBadgeClass = 'badge-menunggu';
         else if (rawSt === 'success') statusBadgeClass = 'badge-success';
         else if (rawSt === 'done') statusBadgeClass = 'badge-done';
         else if (rawSt === 'rejected') statusBadgeClass = 'badge-rejected';
@@ -2203,7 +2224,7 @@
                             <div style="color: #1e293b; line-height: 1.55; font-size: 0.8125rem; font-weight: 500; white-space: pre-wrap;">${escapeHtml(jurnal.keterangan_log)}</div>
                         </div>
                     </div>
-                    <button type="button" onclick="openQuickLogFromDetail(false)" style="background: #ffffff; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 0.71875rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);" onmouseover="this.style.backgroundColor='#f0f9ff'; this.style.borderColor='#0284c7';" onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#cbd5e1';">
+                    <button type="button" onclick="openQuickLogFromDetail(false)" style="background: #ffffff; color: #0066CC; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 0.71875rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);" onmouseover="this.style.backgroundColor='#eff6ff'; this.style.borderColor='#0066CC';" onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#cbd5e1';">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -2214,11 +2235,11 @@
             `;
         } else {
             logContainer.innerHTML = `
-                <div style="background: linear-gradient(135deg, #fffdf7 0%, #fff7ed 100%); border: 1.5px solid #fed7aa; border-radius: 12px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
                     <!-- Header Card: Icon + Title + Badge -->
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #ffedd5; color: #ea580c; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #fdba74;">
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #eff6ff; color: #0066CC; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #bfdbfe;">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                                     <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -2234,7 +2255,7 @@
                                 </div>
                             </div>
                         </div>
-                        <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.71875rem; font-weight: 700; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px;">
+                        <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.71875rem; font-weight: 700; color: #0B2F64; background: #e0f2fe; border: 1px solid #bae6fd; padding: 4px 10px; border-radius: 20px;">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -2244,14 +2265,14 @@
                     </div>
 
                     <!-- Divider Halus -->
-                    <div style="height: 1px; background: #fed7aa; margin: 12px 0; opacity: 0.7;"></div>
+                    <div style="height: 1px; background: #e2e8f0; margin: 12px 0;"></div>
 
                     <!-- Bottom Action Row -->
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
                         <p style="font-size: 0.75rem; color: #475569; margin: 0; line-height: 1.45; flex: 1; min-width: 220px;">
                             Formulir keluhan resmi nasabah belum dapat dicetak sebelum hasil pemeriksaan log dimasukkan.
                         </p>
-                        <button type="button" onclick="openQuickLogFromDetail(false)" style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color: #ffffff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(234, 88, 12, 0.25); white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 10px rgba(234, 88, 12, 0.35)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 5px rgba(234, 88, 12, 0.25)';">
+                        <button type="button" onclick="openQuickLogFromDetail(false)" style="background: #0066CC; color: #ffffff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(0, 102, 204, 0.25); white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#0052a3'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#0066CC'; this.style.transform='translateY(0)';">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -2294,7 +2315,7 @@
     let currentPrintChoiceJurnal = null;
 
     function openPrintChoiceModal(jurnal) {
-        if (jurnal && (jurnal.status || '').toLowerCase().trim() === 'menunggu') {
+        if (jurnal && ['menunggu', 'pending'].includes((jurnal.status || '').toLowerCase().trim())) {
             showMenungguWarning(jurnal);
             return;
         }
@@ -2356,7 +2377,7 @@
         const tm = (jurnal.terminal_transaksi || '-').trim();
         document.getElementById('quickLogTerminal').textContent = ch ? `${tm} (${ch})` : tm;
 
-        const isMenunggu = (jurnal.status || '').toLowerCase().trim() === 'menunggu';
+        const isMenunggu = ['menunggu', 'pending'].includes((jurnal.status || '').toLowerCase().trim());
         const btnSavePrint = document.getElementById('btnSaveQuickLogAndPrint');
         if (btnSavePrint) {
             btnSavePrint.style.display = isMenunggu ? 'none' : 'inline-flex';
@@ -2449,20 +2470,20 @@
                 // Perbarui tombol aksi di baris tabel yang bersangkutan jika ada di DOM
                 const tableRowBtn = document.querySelector(`.btn-cetak-action[data-jurnal-id="${currentQuickLogJurnal.id}"]`);
                 if (tableRowBtn) {
-                    const isMenunggu = (currentQuickLogJurnal.status || '').toLowerCase().trim() === 'menunggu';
+                    const isMenunggu = ['menunggu', 'pending'].includes((currentQuickLogJurnal.status || '').toLowerCase().trim());
                     if (isMenunggu) {
                         tableRowBtn.outerHTML = `
-                            <button type="button" onclick='showMenungguWarning(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #fef3c7; color: #92400e; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px solid #fde68a; cursor: pointer;" title="Status keluhan masih Menunggu. Ubah status penanganan terlebih dahulu untuk dapat mencetak.">
+                            <button type="button" onclick='showMenungguWarning(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #f1f5f9; color: #475569; padding: 6px 11px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; margin-left: 5px; border: 1px solid #cbd5e1; cursor: pointer;" title="Status keluhan masih Pending. Ubah status penanganan terlebih dahulu untuk dapat mencetak.">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                 </svg>
-                                <span>Menunggu 🔒</span>
+                                <span>Pending 🔒</span>
                             </button>
                         `;
                     } else {
                         tableRowBtn.outerHTML = `
-                            <button type="button" onclick='openPrintChoiceModal(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #0284c7; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0369a1; cursor: pointer;" title="Pilih Format Cetak Dokumen">
+                            <button type="button" onclick='openPrintChoiceModal(${JSON.stringify(currentQuickLogJurnal)})' class="btn btn-sm btn-cetak-action" data-jurnal-id="${currentQuickLogJurnal.id}" style="background-color: #0066CC; color: white; padding: 6px 12px; font-size: 0.78125rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border-radius: 4px; margin-left: 5px; border: 1px solid #0052a3; cursor: pointer;" title="Pilih Format Cetak Dokumen">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
                                     <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -2483,7 +2504,7 @@
                 closeQuickLogModal();
 
                 if (autoPrint) {
-                    const isMenunggu = (currentQuickLogJurnal.status || '').toLowerCase().trim() === 'menunggu';
+                    const isMenunggu = ['menunggu', 'pending'].includes((currentQuickLogJurnal.status || '').toLowerCase().trim());
                     if (isMenunggu) {
                         showMenungguWarning(currentQuickLogJurnal);
                     } else {
@@ -2955,8 +2976,8 @@
         // Reset export UI elements
         document.getElementById('exportSpinnerSvg').style.display = 'block';
         document.getElementById('exportSuccessCheckSvg').style.display = 'none';
-        document.getElementById('exportIconWrapper').style.background = '#ecfdf5';
-        document.getElementById('exportIconWrapper').style.borderColor = '#a7f3d0';
+        document.getElementById('exportIconWrapper').style.background = '#eff6ff';
+        document.getElementById('exportIconWrapper').style.borderColor = '#bfdbfe';
         document.getElementById('exportModalTitle').textContent = 'Mengekspor Berkas Master Excel...';
         document.getElementById('exportStatusTitle').textContent = 'Menyiapkan Data Transaksi';
         document.getElementById('exportStatusSub').textContent = 'Mengagregasikan ribuan baris data jurnal dengan relasi master...';
@@ -2998,9 +3019,9 @@
             } else if (curPct >= 65 && curPct < 88) {
                 setExportStepState(2, 'completed');
                 setExportStepState(3, 'active');
-                document.getElementById('exportStatusTitle').textContent = 'Menghubungkan Formula Multi-Sheet';
-                document.getElementById('exportStatusSub').textContent = 'Menautkan formula interaktif Slip Jurnal & Rekapitulasi Cabang...';
-                document.getElementById('exportProgressText').textContent = 'Kalkulasi relasi formula...';
+                document.getElementById('exportStatusTitle').textContent = 'Memformat Data Transaksi';
+                document.getElementById('exportStatusSub').textContent = 'Menerapkan penataan kolom dan gaya perbankan...';
+                document.getElementById('exportProgressText').textContent = 'Menata format kolom...';
             } else if (curPct >= 88 && curPct < 96) {
                 setExportStepState(3, 'completed');
                 setExportStepState(4, 'active');
@@ -3063,11 +3084,11 @@
 
             document.getElementById('exportSpinnerSvg').style.display = 'none';
             document.getElementById('exportSuccessCheckSvg').style.display = 'block';
-            document.getElementById('exportIconWrapper').style.background = '#dcfce7';
-            document.getElementById('exportIconWrapper').style.borderColor = '#86efac';
+            document.getElementById('exportIconWrapper').style.background = '#eff6ff';
+            document.getElementById('exportIconWrapper').style.borderColor = '#93c5fd';
 
             document.getElementById('exportStatusTitle').textContent = 'Ekspor Selesai!';
-            document.getElementById('exportStatusSub').textContent = (totalRows ? totalRows + ' baris transaksi' : 'Seluruh data transaksi') + ' berhasil diekspor ke format multi-sheet.';
+            document.getElementById('exportStatusSub').textContent = (totalRows ? totalRows + ' baris transaksi' : 'Seluruh data transaksi') + ' berhasil diekspor.';
 
             setTimeout(() => {
                 closeExportModal();

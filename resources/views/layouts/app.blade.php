@@ -143,7 +143,7 @@
             </svg>
             <span>Pengaduan Masuk</span>
             @if($jumlahTerkirim > 0)
-                <span class="ml-auto bg-amber-400 text-navy px-2 py-0.5 rounded-full text-[0.71875rem] font-extrabold" title="Menunggu verifikasi">{{ number_format($jumlahTerkirim, 0, ',', '.') }}</span>
+                <span class="ml-auto bg-brand-blue text-white border border-blue-400/40 px-2 py-0.5 rounded-full text-[0.71875rem] font-bold shadow-xs" title="Menunggu verifikasi">{{ number_format($jumlahTerkirim, 0, ',', '.') }}</span>
             @endif
         </a>
 
@@ -235,18 +235,18 @@
 <!-- MAIN CONTENT WRAPPER -->
 <div class="lg:ml-[16.875rem] min-h-screen flex flex-col transition-all duration-300 bg-slate-100">
     <!-- TOPBAR -->
-    <header class="sticky top-0 h-[4.375rem] bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 z-30 shadow-xs">
+    <header class="sticky top-0 h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 z-30 shadow-xs">
         <div class="flex items-center gap-3.5">
-            <button class="lg:hidden bg-transparent border border-slate-200 rounded-lg w-9.5 h-9.5 flex items-center justify-center cursor-pointer text-slate-600 hover:bg-slate-100 hover:text-navy transition-colors" id="sidebarToggle" title="Toggle Sidebar">
+            <button class="lg:hidden bg-transparent border border-slate-200 rounded-lg w-9 h-9 flex items-center justify-center cursor-pointer text-slate-600 hover:bg-slate-100 hover:text-navy transition-colors" id="sidebarToggle" title="Toggle Sidebar">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                     <line x1="3" y1="18" x2="21" y2="18"></line>
                 </svg>
             </button>
-            <div>
-                <h1 class="text-[1.09375rem] font-bold text-navy leading-tight">@yield('page_title', 'Jurnal Keluhan Nasabah')</h1>
-                <p class="text-xs text-slate-500 mt-0.5">@yield('page_subtitle', 'PT Bank Sulteng - Layanan Operasional & Pengaduan Nasabah')</p>
+            <div class="hidden lg:flex items-center gap-2 text-xs font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full bg-brand-blue"></span>
+                <span>E-Jurnal Keluhan Nasabah &bull; PT Bank Sulteng</span>
             </div>
         </div>
 
